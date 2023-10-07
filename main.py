@@ -7,12 +7,9 @@ import cv2
 import discord
 import keyboard
 import numpy as np
-import pygame
 import pytesseract
 import pyttsx3
 from discord.ext import commands
-from pyttsx3 import engine
-import ffmpeg
 import adb
 import imageworks
 from adb import capture_screenshot, focus, tap_random, unload, undock, click_coords3, pilot, dock, openover, swipe, \
@@ -80,6 +77,7 @@ if not device_id:
 else:
     print("Connected to the emulator...")'''
 
+#system functions
 def get_voice_channel_id():
     config_file = 'config.txt'
     voicechannel = None
@@ -210,7 +208,7 @@ async def undock(ctx):
     await adb.undock()
     await ctx.send("Андокаюсь")
 
-@bot.command()
+@bot.command() #Отсановить все циклы и  отключить от voice бота
 async def stop(ctx):
     global looping
     looping = False
@@ -313,7 +311,7 @@ def capture_screenshot():
     subprocess.run([adb_path, '-s', device_id, 'pull', '/sdcard/screenshot.png', './screenshot.png'],
                    stdout=subprocess.DEVNULL)
 
-@bot.command()
+@bot.command() #Запуск функции мониторинга с флагом перехода в мониторинг грида при True
 async def start(ctx):
     #await speak(ctx, message="Запускаю мониторинг!")
     global current_status
@@ -344,6 +342,7 @@ async def start(ctx):
             current_status = 'запущен цикл, угроз не обнаружено'
             grid_result = False
 
+#Обработка грида овервью
 async def grid(ctx):
     img = cv2.imread('local.png')
     img_cropped1 = img[crop_dy1:crop_dy2, crop_dx1:crop_dx2]
@@ -373,12 +372,12 @@ async def grid(ctx):
 def play_text(ctx, vc, file):
      vc.play(discord.FFmpegPCMAudio(file), after=lambda e: print('done', e))
 
-@bot.command()
+@bot.command() #Текущий статус бота по глобальным флагам
 async def status(ctx):
     await ctx.send(current_status)
     #await speak(ctx, message=current_status)
 
-@bot.command()
+@bot.command() #получение комбинированного актуального изображения в дискорд канал
 async def local(ctx):
     if not looping:
         await ctx.send("Нельзя получить скриншот пока не запустите цикл !start.")
@@ -388,8 +387,8 @@ async def local(ctx):
             await ctx.send(file=picture)
     await asyncio.sleep(1)
 
-@bot.command()
-async def showfiles(ctx): #отладка, визуализация машинного зрения
+@bot.command() #отладка, визуализация машинного зрения
+async def showfiles(ctx):
     with open('1.png', 'rb') as f:
         picture = discord.File(f)
         await ctx.send(file=picture)
@@ -402,8 +401,8 @@ async def showfiles(ctx): #отладка, визуализация машинн
         nonzero_count = np.count_nonzero(diff)
         await ctx.send(f"Различие пикселей: {nonzero_count}")
 
-@bot.command()
-async def repairimages(ctx): #починить изображения
+@bot.command() #починить изображения способом подмены
+async def repairimages(ctx):
     target_image = 'screenshot.png'
     new_image = 'screen.png'
 

@@ -98,8 +98,6 @@ def tap_random(coords):
         [adb_path, '-s', device_id, 'shell', 'input', 'tap', str(random_x * image_width), str(random_y * image_height)],
         stdout=subprocess.DEVNULL)
 
-
-
 def capture_screenshot():
     subprocess.run([adb_path, '-s', device_id, 'shell', 'screencap', '-p', '/sdcard/screenshot.png'])
     subprocess.run([adb_path, '-s', device_id, 'pull', '/sdcard/screenshot.png', './screenshot.png'],
@@ -173,7 +171,6 @@ async def unload(): #Разгрузка карго в доке
     delay = random.uniform(3, 4)
     await asyncio.sleep(delay)
     tap_random(closewindow)
-
 
 async def module(): #Активация 5 нижних модулей
     drill1 = (650, 495)
