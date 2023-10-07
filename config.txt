@@ -1,0 +1,3 @@
+device_id = emulator-5554
+token = MTA5NDk0NzQzMzczMTA4NDM4OA.Gd6cRT.gx0rSe4vo8Q9dA4nMkpDq144XrWWyeTsqmslP4
+voicechannel = 1143557824429961352

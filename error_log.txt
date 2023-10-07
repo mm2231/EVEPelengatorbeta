@@ -1,0 +1,104 @@
+Произошла ошибка:
+Traceback (most recent call last):
+  File "C:\Users\Женя\PycharmProjects\BotplusTest\main.py", line 510, in start
+    print(f'Alarm {diff:.2f}')
+          ^^^^^^^^^^^^^^^^^^^
+TypeError: unsupported format string passed to numpy.ndarray.__format__
+Произошла ошибка:
+Traceback (most recent call last):
+  File "C:\Users\Женя\PycharmProjects\BotplusTest\main.py", line 504, in start
+    cv2.imwrite(current_file, process_image('screenshot.png'))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Женя\PycharmProjects\BotplusTest\main.py", line 315, in process_image
+    img_cropped = crop_image(file_path, crop_coords)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Женя\PycharmProjects\BotplusTest\main.py", line 311, in crop_image
+    img_cropped = img[crop_coords[1]:crop_coords[3], crop_coords[0]:crop_coords[2]]
+                  ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: 'NoneType' object is not subscriptable
+Произошла ошибка:
+Traceback (most recent call last):
+  File "C:\Users\Женя\PycharmProjects\BotplusTest\main.py", line 505, in start
+    cv2.imwrite(current_file, process_image('screenshot.png'))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Женя\PycharmProjects\BotplusTest\main.py", line 316, in process_image
+    img_cropped = crop_image(file_path, crop_coords)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Женя\PycharmProjects\BotplusTest\main.py", line 312, in crop_image
+    img_cropped = img[crop_coords[1]:crop_coords[3], crop_coords[0]:crop_coords[2]]
+                  ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: 'NoneType' object is not subscriptable
+Произошла ошибка:
+Traceback (most recent call last):
+  File "C:\Users\Женя\PycharmProjects\BotplusTest\main.py", line 814, in mine
+    await dock()
+          ^^^^^^
+TypeError: Command.__call__() missing 1 required positional argument: 'context'
+Произошла ошибка:
+Traceback (most recent call last):
+  File "C:\Users\Женя\PycharmProjects\BotplusTest\main.py", line 814, in mine
+    await dock()
+          ^^^^^^
+TypeError: Command.__call__() missing 1 required positional argument: 'context'
+Произошла ошибка:
+Traceback (most recent call last):
+  File "C:\Users\Женя\PycharmProjects\BotplusTest\main.py", line 814, in mine
+    await dock()
+          ^^^^^^
+TypeError: Command.__call__() missing 1 required positional argument: 'context'
+Произошла ошибка:
+Traceback (most recent call last):
+  File "C:\Users\Женя\PycharmProjects\BotplusTest\main.py", line 814, in mine
+    await dock()
+          ^^^^^^
+TypeError: Command.__call__() missing 1 required positional argument: 'context'
+Произошла ошибка:
+Traceback (most recent call last):
+  File "C:\Users\Женя\PycharmProjects\BotplusTest\main.py", line 814, in mine
+    await dock()
+          ^^^^^^
+TypeError: Command.__call__() missing 1 required positional argument: 'context'
+Произошла ошибка:
+Traceback (most recent call last):
+  File "C:\Users\Женя\PycharmProjects\BotplusTest\main.py", line 816, in mine
+    await docker(ctx)
+  File "C:\Users\Женя\PycharmProjects\BotplusTest\main.py", line 907, in docker
+    await unload()
+          ^^^^^^^^
+TypeError: Command.__call__() missing 1 required positional argument: 'context'
+Произошла ошибка:
+Traceback (most recent call last):
+  File "C:\Users\Женя\PycharmProjects\BotplusTest\main.py", line 184, in starter
+    cv2.imwrite(current_file, imageworks.process_image('screenshot.png'))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Женя\PycharmProjects\BotplusTest\imageworks.py", line 22, in process_image
+    img_cropped = crop_image(file_path, crop_coords)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Женя\PycharmProjects\BotplusTest\imageworks.py", line 18, in crop_image
+    img_cropped = img[crop_coords[1]:crop_coords[3], crop_coords[0]:crop_coords[2]]
+                  ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: 'NoneType' object is not subscriptable
+Произошла ошибка:
+Traceback (most recent call last):
+  File "C:\Users\Женя\PycharmProjects\BotplusTest\main.py", line 184, in starter
+    cv2.imwrite(current_file, imageworks.process_image('screenshot.png'))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Женя\PycharmProjects\BotplusTest\imageworks.py", line 22, in process_image
+    img_cropped = crop_image(file_path, crop_coords)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Женя\PycharmProjects\BotplusTest\imageworks.py", line 18, in crop_image
+    img_cropped = img[crop_coords[1]:crop_coords[3], crop_coords[0]:crop_coords[2]]
+                  ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: 'NoneType' object is not subscriptable
+Произошла ошибка:
+Traceback (most recent call last):
+  File "C:\Users\Женя\PycharmProjects\BotplusTest\main.py", line 183, in starter
+    cv2.imwrite(current_file, imageworks.process_image('screenshot.png'))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Женя\PycharmProjects\BotplusTest\imageworks.py", line 22, in process_image
+    img_cropped = crop_image(file_path, crop_coords)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Женя\PycharmProjects\BotplusTest\imageworks.py", line 18, in crop_image
+    img_cropped = img[crop_coords[1]:crop_coords[3], crop_coords[0]:crop_coords[2]]
+                  ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: 'NoneType' object is not subscriptable
