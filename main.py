@@ -12,8 +12,7 @@ import pyttsx3
 from discord.ext import commands
 import adb
 import imageworks
-from adb import capture_screenshot, focus, tap_random, unload, undock, click_coords3, pilot, dock, openover, swipe, \
-    click_coords
+from adb import capture_screenshot, focus, tap_random, click_coords
 
 adb_path = r'platform-tools/adb.exe'
 intents = discord.Intents.all()
