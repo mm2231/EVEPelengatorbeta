@@ -93,7 +93,7 @@ def get_voice_channel_id():
 
 @bot.event
 async def on_ready():
-    print(f'Ready to go')
+    print(f'Погнали!')
 
     voicechannel = get_voice_channel_id()
 
@@ -121,10 +121,10 @@ async def starteve(ctx):
     command = f'{adb_path} shell am start -n com.netease.eve.en/com.netease.ntunisdk.base.deeplink.UniDeepLinkActivity'
     try:
         subprocess.run(command, shell=True, check=True)
-        print("The application has been successfully launched")
+        print("Приложение успешно запущено")
     except subprocess.CalledProcessError:
-        print("Error when launching the application")
-    await ctx.send("Launching the game client")
+        print("Ошибка при запуске приложения")
+    await ctx.send("Запускаю игровой клиент")
 
 @bot.command()
 async def closeeve(ctx):
@@ -133,13 +133,13 @@ async def closeeve(ctx):
     command = f'{adb_path} shell am force-stop {package_name}'
     try:
         subprocess.run(command, shell=True, check=True)
-        await ctx.send("Application closed successfully")
+        await ctx.send("Приложение успешно закрыто")
     except subprocess.CalledProcessError:
-        await ctx.send("Error when closing the application")
+        await ctx.send("Ошибка при закрытии приложения")
 
 @bot.command()
 async def restart(ctx):
-    await ctx.send("Restarting the script, all functions are disabled")
+    await ctx.send("Перезагрузка скрипта, все функции отключены")
     subprocess.Popen([sys.executable, "restart_script.py"], creationflags=subprocess.CREATE_NEW_CONSOLE)
     await bot.close()
 
@@ -163,7 +163,7 @@ async def screen(ctx):
         image = discord.File(f, filename='screenmin.png')
         await ctx.send(file=image)
 
-####################################################BOT
+####################################################BOT AI
 
 @bot.command()
 async def zoom(ctx):
@@ -215,7 +215,7 @@ async def stop(ctx):
     global looping
     looping = False
     await ctx.send("Отключаюсь")
-    await speak(ctx, message="Отключаюсь!")
+    #await speak(ctx, message="Отключаюсь!")
     voice_client = ctx.voice_client
     if voice_client is None:
         return
