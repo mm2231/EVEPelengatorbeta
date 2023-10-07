@@ -46,9 +46,9 @@ else:
 '''
 adb_devices_cmd = f"{adb_path} devices"
 output = subprocess.check_output(adb_devices_cmd.split()).decode()
-devices = output.strip().split("\n")[1:]'''
+devices = output.strip().split("\n")[1:]
 
-'''def select_device(devices):
+def select_device(devices):
     if len(devices) == 1:
         return devices[0].split("\t")[0]
     print("List of devices connected to ADB:")
@@ -241,7 +241,6 @@ async def starter(ctx): #Основной бот автоядра
                 if np.count_nonzero(diff) >= 175:
                     print(f'Alarm!')
                     tap_random(click_coords)
-                    #await speaker(ctx, message="Обнаружена угроза. Корабль направлен в док!")
                     await ctx.send("Тревога!")
                     await ctx.send(np.count_nonzero(diff))
                     cv2.imwrite('3.png', diff)
@@ -365,8 +364,10 @@ async def grid(ctx):
                 vc = await voice_channel.connect()
             elif vc.channel != voice_channel:
                 await vc.move_to(voice_channel)
-            await speak(ctx, message="Внимание! Обнаружена угроза!")
-            await speak(ctx, message=text)
+            vc.play(discord.FFmpegPCMAudio('grid.mp3'))
+            while vc.is_playing():
+                await asyncio.sleep(1)
+            vc.is_playing()
         await asyncio.sleep(1)
 
 def play_text(ctx, vc, file):
