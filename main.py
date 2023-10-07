@@ -349,32 +349,6 @@ async def start(ctx):
             current_status = 'запущен цикл, угроз не обнаружено'
             grid_result = False
 
-########################################## oldest function
-
-'''
-        img = cv2.imread(local_file)
-        img_cropped = img[crop_y1:crop_y2, crop_x1:crop_x2]
-        cv2.imwrite('22.png', img_cropped)
-        img1 = cv2.imread('11.png')
-        img2 = cv2.imread('22.png')
-        diff = cv2.absdiff(img1, img2)
-        gray = cv2.cvtColor(diff, cv2.COLOR_BGR2GRAY)
-        (_, thresh) = cv2.threshold(gray, 30, 255, cv2.THRESH_BINARY)
-        contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-        if len(contours) > 0:
-            x, y, w, h = cv2.boundingRect(contours[0])
-            cv2.rectangle(img1, (x, y), (x + w, y + h), (0, 0, 255), 2)
-            cv2.imwrite('result.png', img1)
-            for i in range(1):
-                await asyncio.sleep(1.5)
-                grid_result = await grid(ctx)
-                if grid_result:
-                    await ctx.send(file=discord.File('local.png'))
-                    break
-        else:
-            grid_result = False
-        await asyncio.sleep(1)
-'''
 
 async def grid(ctx):
     img = cv2.imread('local.png')
@@ -408,7 +382,7 @@ def play_text(ctx, vc, file):
 @bot.command()
 async def status(ctx):
     await ctx.send(current_status)
-    await speak(ctx, message=current_status)
+    #await speak(ctx, message=current_status)
 
 @bot.command()
 async def local(ctx):
@@ -419,7 +393,6 @@ async def local(ctx):
             picture = discord.File(f)
             await ctx.send(file=picture)
     await asyncio.sleep(1)
-
 
 @bot.command()
 async def showfiles(ctx): #отладка, визуализация машинного зрения
@@ -452,9 +425,9 @@ async def repairimages(ctx): #починить изображения
         os.rename(new_image, target_image)
         await ctx.send("починил")
 
-##########################################################################################################TTS
+##########################################################################################################TTS Fnc
 
-@bot.command()
+@bot.command() #text to speach fnc, save the file and send it to discord channel
 async def tts(ctx, text):
     engine = pyttsx3.init()
     engine.setProperty('rate', 150)  # Настройка скорости речи (по умолчанию 200)
@@ -468,7 +441,7 @@ async def tts(ctx, text):
     with open(filename, 'rb') as file:
         await ctx.send(file=discord.File(file, filename))
 
-@bot.command()
+@bot.command() #to say something on the Discord channel
 async def speak(ctx, *, message):
     if ctx.author.voice is None:
         await ctx.send("Вы должны находиться в голосовом канале, чтобы использовать эту команду.")
