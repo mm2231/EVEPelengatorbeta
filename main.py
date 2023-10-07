@@ -420,49 +420,6 @@ async def local(ctx):
             await ctx.send(file=picture)
     await asyncio.sleep(1)
 
-'''
-@bot.command()
-async def checkmap(ctx):
-    global looping
-    print('Запускаю цикл скринов')
-    looping = False
-    starmap = (161, 26)
-    closestarmap = (924, 29)
-    tap_random(starmap)
-    await asyncio.sleep(8)
-    capture_screenshot()
-    await asyncio.sleep(2)
-    tap_random(closestarmap)
-    screenshot = cv2.imread('screenshot.png')
-    cv2.rectangle(screenshot, (7, 316), (111, 396), (0, 0, 0), -1)
-    cv2.imwrite('screenshot.png', screenshot)
-    screenshot = cv2.imread('screenshot.png')
-    screenshot1 = cv2.imread('screenshot1.png')
-    gray_screenshot = cv2.cvtColor(screenshot, cv2.COLOR_BGR2GRAY)
-    gray_screenshot1 = cv2.cvtColor(screenshot1, cv2.COLOR_BGR2GRAY)
-    diff = cv2.absdiff(gray_screenshot, gray_screenshot1)
-    _, thresholded_diff = cv2.threshold(diff, 30, 255, cv2.THRESH_BINARY)
-    contours, _ = cv2.findContours(thresholded_diff, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    for contour in contours:
-        x, y, w, h = cv2.boundingRect(contour)
-        cv2.rectangle(screenshot, (x, y), (x + w, y + h), (0, 255, 0), 2)
-    cv2.imwrite('rectangle.png', screenshot)
-    os.remove('screenshot1.png')
-    shutil.copy('screenshot.png', 'screenshot1.png')
-    if len(contours) > 0:
-        await asyncio.sleep(1)
-        await ctx.send("Обнаружено изменение пространства в регионе, возможно появление или исчезновение червоточен!")
-        with open('rectangle.png', 'rb') as f:
-            picture = discord.File(f)
-            await ctx.send(file=picture)
-            await asyncio.sleep(1)
-            await monitoring(ctx)
-    else:
-        await ctx.send("Новых червоточен в регионе не обнаружено")
-        await asyncio.sleep(1)
-        await monitoring(ctx)
-
-'''
 
 @bot.command()
 async def showfiles(ctx): #отладка, визуализация машинного зрения
