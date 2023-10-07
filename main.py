@@ -222,7 +222,7 @@ async def stop(ctx):
     await voice_client.disconnect()
 
 @bot.command()
-async def starter(ctx):
+async def starter(ctx): #Основной бот автоядра
     global looping
     looping = True
     while looping:
@@ -250,10 +250,6 @@ async def starter(ctx):
                     with open('3.png', 'rb') as f:
                         picture = discord.File(f)
                         await ctx.send(file=picture)
-                    pygame.mixer.init()
-                    pygame.mixer.music.load("diff.mp3")
-                    pygame.mixer.music.play()
-                    while pygame.mixer.music.get_busy():
                         with open('screenshot.png', 'rb') as f:
                             picture = discord.File(f)
                             await ctx.send(file=picture)
@@ -319,7 +315,7 @@ def capture_screenshot():
 
 @bot.command()
 async def start(ctx):
-    await speak(ctx, message="Запускаю мониторинг!")
+    #await speak(ctx, message="Запускаю мониторинг!")
     global current_status
     global looping
     print('Запускаю цикл скринов')
@@ -339,7 +335,6 @@ async def start(ctx):
         result = await imageworks.check_enemies()
         if result:
             current_status = 'запущен цикл, угроза безопасности в системе'
-            #print("в системе враги")
             await asyncio.sleep(1.5)
             grid_result = await grid(ctx)
             if grid_result:
@@ -348,7 +343,6 @@ async def start(ctx):
         else:
             current_status = 'запущен цикл, угроз не обнаружено'
             grid_result = False
-
 
 async def grid(ctx):
     img = cv2.imread('local.png')
