@@ -286,6 +286,21 @@ async def starter(ctx): #Основной бот автоядра
                 f.write(traceback.format_exc())
         await asyncio.sleep(1)
 
+@bot.command()#Инициализация выхода из дока и подготовка к старту
+async def runner(ctx):
+    await ctx.send("Инициализация выхода из дока и подготовка к старту")
+    await adb.undock()
+    await asyncio.sleep(16)
+    await adb.zoom()
+    await asyncio.sleep(1)
+    await adb.pilot()
+    await asyncio.sleep(1)
+    await adb.core()
+    await asyncio.sleep(1)
+    await ctx.send("Подготовка к старту выполнена, высылаю скриншот для проверки и запускаю мониторинг")
+    await screen(ctx)
+    await starter(ctx)
+
 ############################################################## мониторинг, локалбот
 
 def capture_screenshot():
