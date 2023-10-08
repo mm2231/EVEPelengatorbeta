@@ -297,9 +297,8 @@ async def runner(ctx):
     await asyncio.sleep(1)
     await adb.core()
     await asyncio.sleep(1)
-    await ctx.send("Подготовка к старту выполнена, высылаю скриншот для проверки и запускаю мониторинг")
+    await ctx.send("Подготовка к старту выполнена, высылаю скриншот для проверки")
     await screen(ctx)
-    await starter(ctx)
 
 ############################################################## мониторинг, локалбот
 
