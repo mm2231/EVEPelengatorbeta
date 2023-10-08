@@ -221,6 +221,7 @@ async def stop(ctx):
 
 @bot.command()
 async def starter(ctx): #Основной бот автоядра
+    first_module = (650, 497)
     global looping
     looping = True
     while looping:
@@ -254,13 +255,6 @@ async def starter(ctx): #Основной бот автоядра
                         continue
                     return
                 else:
-                    #print('Все в порядке')
-                    #await imageworks.check_open_over() #проверка на овервью ########################
-                    #keywords = "small,medium,large"
-                    #await imageworks.find(keywords)
-                    #await asyncio.sleep(1)
-                    #keywords1 = "Wapr,warp,arp,war"
-                    #await imageworks.find(keywords1)
                     image_path = "screenshot.png"
                     img = cv2.imread(image_path)
                     x = 926  # Координата x
@@ -283,19 +277,7 @@ async def starter(ctx): #Основной бот автоядра
                         b_max = 185  # Максимальное значение B
                         # print("Значения RGB пикселя:", r, g, b)
                         if r > r_min and g < g_max and b < b_max:
-                            await focus()
-                            image_path = "screenshot.png" #Проверка на окно ошибки сеток
-                            img = cv2.imread(image_path)
-                            x = 641  # Координата x
-                            y = 186  # Координата y
-                            b, g, r = img[y, x]  # Получаем значения синего, зеленого и красного цветов пикселя
-                            r_min = 130  # Минимальное значение R
-                            g_max = 170  # Максимальное значение G
-                            b_max = 161  # Максимальное значение B
-                            print("Значения RGB пикселя:", r, g, b)
-                            if r > r_min and g < g_max and b < b_max:
-                                closestasis = (635, 180)
-                                tap_random(closestasis)
+                            await tap_random(first_module)
         except Exception as e:
             print("Произошла ошибка:")
             traceback.print_exc()
