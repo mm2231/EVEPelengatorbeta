@@ -462,6 +462,102 @@ async def speak(ctx, *, message):
     while voice_client.is_playing():
         await asyncio.sleep(1)
 
+############################################################## trade
+
+number_coordinates = {
+    "0": (777, 463),
+    "1": (663, 267),
+    "2": (777, 269),
+    "3": (893, 267),
+    "4": (667, 332),
+    "5": (778, 332),
+    "6": (891, 335),
+    "7": (662, 400),
+    "8": (778, 397),
+    "9": (890, 398),
+}
+
+def click_number(number):
+    for digit in str(number):
+        x, y = number_coordinates[digit]
+        adb.tap_cortage(x, y)
+
+def extract():
+    crop_x1, crop_y1, crop_x2, crop_y2 = 564, 245, 702, 267
+    screenshot = cv2.imread('screenshot.png')
+    cropped_image = screenshot[crop_y1:crop_y2, crop_x1:crop_x2]
+    gray_image = cv2.cvtColor(cropped_image, cv2.COLOR_BGR2GRAY)
+    price_text = pytesseract.image_to_string(gray_image, config='--tessdata-dir "C:\\Program Files\\Tesseract-OCR\\tessdata"', output_type='string')
+    price_text = price_text.replace('.', '').replace(',', '')
+    price_text = price_text.split('.')[0]
+    cv2.imwrite("price.png", gray_image)
+
+    return price_text
+
+def crop():
+    crop_x1, crop_y1, crop_x2, crop_y2 = 120, 91, 541, 176
+    screenshot = cv2.imread('screenshot.png')
+    cropped_image = screenshot[crop_y1:crop_y2, crop_x1:crop_x2]
+    cv2.imwrite("Name.png", cropped_image)
+
+async def processorder(ctx):
+    close = (856, 66)
+    buyclick = (48, 232)
+    buy = (793, 468)
+    tapcalculate = (540, 217)
+    pcs = (589, 284)
+    order = (480, 468)
+####################################################################
+    await asyncio.sleep(3)
+    capture_screenshot()
+    await asyncio.sleep(1)
+    crop()
+    await asyncio.sleep(1)
+    price_text = extract()
+    price_number = float(price_text.replace(',', '.').split('.')[0])
+    seventy_percent = int(price_number * 0.7)
+    margin = int(price_number * 0.15)
+    with open('Name.png', 'rb') as f:
+        picture = discord.File(f)
+        await ctx.send(file=picture)
+    await ctx.send(f"Текущая цена: {price_text}")
+    await ctx.send(f"Устанавливаемая цена: {seventy_percent}")
+    await ctx.send(f"Предпологаемая маржа: {margin}")
+    '''
+    tap_random(buyclick)
+    await asyncio.sleep(2)
+    tap_random(buy)
+    await asyncio.sleep(1)
+    tap_random(tapcalculate)
+    await asyncio.sleep(0.5)
+    click_number(seventy_percent)
+    await asyncio.sleep(1)
+    tap_random(pcs)
+    click_number(1)
+    tap_random(order)
+    await asyncio.sleep(1)
+    tap_random(close)
+    '''
+
+@bot.command()
+async def trade(ctx):
+    marketclick = (137, 88)
+    favorites = (104, 517)
+    item_01 = (313, 127)
+    item_02 = (493, 121)
+    item_03 = (683, 131)
+    item_04 = (866, 128)
+    item_05 = (310, 270)
+    item_06 = (496, 269)
+    item_07 = (682, 267)
+    item_08 = (863, 269)
+    tap_random(marketclick)
+    await asyncio.sleep(2)
+    tap_random(favorites)
+    await asyncio.sleep(1)
+    tap_random(item_01)             ############################## Отсчетная точка
+    await processorder(ctx)
+
 if __name__ == "__main__":
     with open(config_file, 'r') as file:
         for line in file:
