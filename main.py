@@ -220,6 +220,7 @@ async def stop(ctx):
 
 @bot.command()
 async def starter(ctx): #Основной бот автоядра
+    first_module = (650, 497)
     global looping
     looping = True
     while looping:
@@ -252,13 +253,6 @@ async def starter(ctx): #Основной бот автоядра
                         continue
                     return
                 else:
-                    #print('Все в порядке')
-                    #await imageworks.check_open_over() #проверка на овервью ########################
-                    #keywords = "small,medium,large"
-                    #await imageworks.find(keywords)
-                    #await asyncio.sleep(1)
-                    #keywords1 = "Wapr,warp,arp,war"
-                    #await imageworks.find(keywords1)
                     image_path = "screenshot.png"
                     img = cv2.imread(image_path)
                     x = 926  # Координата x
@@ -281,19 +275,7 @@ async def starter(ctx): #Основной бот автоядра
                         b_max = 185  # Максимальное значение B
                         # print("Значения RGB пикселя:", r, g, b)
                         if r > r_min and g < g_max and b < b_max:
-                            await focus()
-                            image_path = "screenshot.png" #Проверка на окно ошибки сеток
-                            img = cv2.imread(image_path)
-                            x = 641  # Координата x
-                            y = 186  # Координата y
-                            b, g, r = img[y, x]  # Получаем значения синего, зеленого и красного цветов пикселя
-                            r_min = 130  # Минимальное значение R
-                            g_max = 170  # Максимальное значение G
-                            b_max = 161  # Максимальное значение B
-                            print("Значения RGB пикселя:", r, g, b)
-                            if r > r_min and g < g_max and b < b_max:
-                                closestasis = (635, 180)
-                                tap_random(closestasis)
+                            await tap_random(first_module)
         except Exception as e:
             print("Произошла ошибка:")
             traceback.print_exc()
@@ -301,6 +283,21 @@ async def starter(ctx): #Основной бот автоядра
                 f.write("Произошла ошибка:\n")
                 f.write(traceback.format_exc())
         await asyncio.sleep(1)
+
+@bot.command()#Инициализация выхода из дока и подготовка к старту
+async def runner(ctx):
+    await ctx.send("Инициализация выхода из дока и подготовка к старту")
+    await adb.undock()
+    await asyncio.sleep(16)
+    await adb.zoom()
+    await asyncio.sleep(1)
+    await adb.pilot()
+    await asyncio.sleep(1)
+    await adb.core()
+    await asyncio.sleep(1)
+    await ctx.send("Подготовка к старту выполнена, высылаю скриншот для проверки и запускаю мониторинг")
+    await screen(ctx)
+    await starter(ctx)
 
 ############################################################## мониторинг, локалбот
 
@@ -461,6 +458,102 @@ async def speak(ctx, *, message):
     voice_client.play(discord.FFmpegPCMAudio(filename))
     while voice_client.is_playing():
         await asyncio.sleep(1)
+
+############################################################## trade
+
+number_coordinates = {
+    "0": (777, 463),
+    "1": (663, 267),
+    "2": (777, 269),
+    "3": (893, 267),
+    "4": (667, 332),
+    "5": (778, 332),
+    "6": (891, 335),
+    "7": (662, 400),
+    "8": (778, 397),
+    "9": (890, 398),
+}
+
+def click_number(number):
+    for digit in str(number):
+        x, y = number_coordinates[digit]
+        adb.tap_cortage(x, y)
+
+def extract():
+    crop_x1, crop_y1, crop_x2, crop_y2 = 564, 245, 702, 267
+    screenshot = cv2.imread('screenshot.png')
+    cropped_image = screenshot[crop_y1:crop_y2, crop_x1:crop_x2]
+    gray_image = cv2.cvtColor(cropped_image, cv2.COLOR_BGR2GRAY)
+    price_text = pytesseract.image_to_string(gray_image, config='--tessdata-dir "C:\\Program Files\\Tesseract-OCR\\tessdata"', output_type='string')
+    price_text = price_text.replace('.', '').replace(',', '')
+    price_text = price_text.split('.')[0]
+    cv2.imwrite("price.png", gray_image)
+
+    return price_text
+
+def crop():
+    crop_x1, crop_y1, crop_x2, crop_y2 = 120, 91, 541, 176
+    screenshot = cv2.imread('screenshot.png')
+    cropped_image = screenshot[crop_y1:crop_y2, crop_x1:crop_x2]
+    cv2.imwrite("Name.png", cropped_image)
+
+async def processorder(ctx):
+    close = (856, 66)
+    buyclick = (48, 232)
+    buy = (793, 468)
+    tapcalculate = (540, 217)
+    pcs = (589, 284)
+    order = (480, 468)
+####################################################################
+    await asyncio.sleep(3)
+    capture_screenshot()
+    await asyncio.sleep(1)
+    crop()
+    await asyncio.sleep(1)
+    price_text = extract()
+    price_number = float(price_text.replace(',', '.').split('.')[0])
+    seventy_percent = int(price_number * 0.7)
+    margin = int(price_number * 0.15)
+    with open('Name.png', 'rb') as f:
+        picture = discord.File(f)
+        await ctx.send(file=picture)
+    await ctx.send(f"Текущая цена: {price_text}")
+    await ctx.send(f"Устанавливаемая цена: {seventy_percent}")
+    await ctx.send(f"Предпологаемая маржа: {margin}")
+    '''
+    tap_random(buyclick)
+    await asyncio.sleep(2)
+    tap_random(buy)
+    await asyncio.sleep(1)
+    tap_random(tapcalculate)
+    await asyncio.sleep(0.5)
+    click_number(seventy_percent)
+    await asyncio.sleep(1)
+    tap_random(pcs)
+    click_number(1)
+    tap_random(order)
+    await asyncio.sleep(1)
+    tap_random(close)
+    '''
+
+@bot.command()
+async def trade(ctx):
+    marketclick = (137, 88)
+    favorites = (104, 517)
+    item_01 = (313, 127)
+    item_02 = (493, 121)
+    item_03 = (683, 131)
+    item_04 = (866, 128)
+    item_05 = (310, 270)
+    item_06 = (496, 269)
+    item_07 = (682, 267)
+    item_08 = (863, 269)
+    tap_random(marketclick)
+    await asyncio.sleep(2)
+    tap_random(favorites)
+    await asyncio.sleep(1)
+    tap_random(item_01)             ############################## Отсчетная точка
+    await processorder(ctx)
 
 if __name__ == "__main__":
     with open(config_file, 'r') as file:
