@@ -12,7 +12,7 @@ import pyttsx3
 from discord.ext import commands
 import adb
 import imageworks
-from adb import capture_screenshot, focus, tap_random, click_coords
+from adb import capture_screenshot, tap_random, click_coords
 
 adb_path = r'platform-tools/adb.exe'
 intents = discord.Intents.all()
@@ -77,6 +77,24 @@ else:
     print("Connected to the emulator...")'''
 
 #system functions
+
+@bot.command()
+async def matrix(ctx):
+    capture_screenshot()
+    adb.add_grid_to_screenshot('screenshot.png', (25, 15))
+    with open('coords.png', 'rb') as f:
+        image = discord.File(f, filename='coords.png')
+        await ctx.send(file=image)
+
+@bot.command()
+async def tap(ctx, square_number):
+    square_number = int(square_number)
+    if f'coord_{square_number}' in globals():
+        adb.click_on_coordinate(square_number)
+        await ctx.send('Клик по квадрату выполнен')
+    else:
+        await ctx.send('Неверный номер квадрата')
+
 def get_voice_channel_id():
     config_file = 'config.txt'
     voicechannel = None
@@ -271,7 +289,6 @@ async def dock_detector():
             await adb.core()
             await asyncio.sleep(1)
             break
-
 
 @bot.command()#Инициализация выхода из дока и подготовка к старту
 async def runner(ctx):
