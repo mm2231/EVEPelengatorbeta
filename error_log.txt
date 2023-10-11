@@ -102,3 +102,18 @@ Traceback (most recent call last):
     img_cropped = img[crop_coords[1]:crop_coords[3], crop_coords[0]:crop_coords[2]]
                   ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 TypeError: 'NoneType' object is not subscriptable
+Произошла ошибка:
+Traceback (most recent call last):
+  File "C:\Users\Женя\PycharmProjects\EVEPelengatorbeta\main.py", line 234, in starter
+    result = await imageworks.check_enemies()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Женя\PycharmProjects\EVEPelengatorbeta\imageworks.py", line 160, in check_enemies
+    cv2.imwrite(current_file, process_image('screenshot.png'))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Женя\PycharmProjects\EVEPelengatorbeta\imageworks.py", line 22, in process_image
+    img_cropped = crop_image(file_path, crop_coords)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Женя\PycharmProjects\EVEPelengatorbeta\imageworks.py", line 18, in crop_image
+    img_cropped = img[crop_coords[1]:crop_coords[3], crop_coords[0]:crop_coords[2]]
+                  ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: 'NoneType' object is not subscriptable

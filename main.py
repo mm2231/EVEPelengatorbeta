@@ -229,7 +229,7 @@ async def starter(ctx):
             capture_screenshot()
             cv2.imwrite(previous_file, imageworks.process_image('screenshot.png'))
             while looping:
-                await asyncio.sleep(0.1)
+                await asyncio.sleep(0.5)
                 capture_screenshot()
                 result = await imageworks.check_enemies()
                 if result:
@@ -254,11 +254,13 @@ async def dock_detector():
     global looping
     looping = True
     while looping:
-        await asyncio.sleep(30)
+        print("инициализация перезапуска")
+        await asyncio.sleep(60)
         capture_screenshot()
         result = await imageworks.check_enemies()
         if result:
-            pass
+            print("в системе враги")
+            continue
         else:
             await adb.undock()
             await asyncio.sleep(20)
@@ -268,10 +270,6 @@ async def dock_detector():
             await asyncio.sleep(1)
             await adb.core()
             await asyncio.sleep(1)
-
-        if looping:
-            continue
-        else:
             break
 
 
