@@ -249,26 +249,29 @@ async def starter(ctx): #Основной бот автоядра
                 f.write(traceback.format_exc())
         await asyncio.sleep(1)
 
-async def run(): #инициализация проверки врагов в доке с условием выхода
-    await asyncio.sleep(40)
-    capture_screenshot()
-    cv2.imwrite(current_file, imageworks.process_image('screenshot.png'))
-    img1 = cv2.imread(previous_file)
-    img2 = cv2.imread(current_file)
-    diff = cv2.absdiff(img1, img2)
-    # print(np.count_nonzero(diff))
-    if np.count_nonzero(diff) >= 175:
-        # print(f'Alarm!')
-        pass
-    else:
-        await adb.undock()
-        await asyncio.sleep(20)
-        await adb.zoom()
-        await asyncio.sleep(1)
-        await adb.pilot()
-        await asyncio.sleep(1)
-        await adb.core()
-        await asyncio.sleep(1)
+async def run():
+    global looping
+    looping = True
+    while looping:
+        await asyncio.sleep(30)
+        capture_screenshot()
+        result = await imageworks.check_enemies()
+        if result:
+            pass
+        else:
+            await adb.undock()
+            await asyncio.sleep(20)
+            await adb.zoom()
+            await asyncio.sleep(1)
+            await adb.pilot()
+            await asyncio.sleep(1)
+            await adb.core()
+            await asyncio.sleep(1)
+
+        if looping:
+            continue
+        else:
+            break
 
 
 @bot.command()#Инициализация выхода из дока и подготовка к старту
