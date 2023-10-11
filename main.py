@@ -231,23 +231,13 @@ async def starter(ctx): #Основной бот автоядра
             while looping:
                 await asyncio.sleep(0.1)
                 capture_screenshot()
-                cv2.imwrite(current_file, imageworks.process_image('screenshot.png'))
-                img1 = cv2.imread(previous_file)
-                img2 = cv2.imread(current_file)
-                diff = cv2.absdiff(img1, img2)
-                #print(np.count_nonzero(diff))
-                if np.count_nonzero(diff) >= 175:
-                    #print(f'Alarm!')
+                result = await imageworks.check_enemies()
+                if result:
                     tap_random(click_coords)
                     await ctx.send("Тревога!")
-                    await ctx.send(np.count_nonzero(diff))
-                    cv2.imwrite('3.png', diff)
-                    with open('3.png', 'rb') as f:
+                    with open('screenshot.png', 'rb') as f:
                         picture = discord.File(f)
                         await ctx.send(file=picture)
-                        with open('screenshot.png', 'rb') as f:
-                            picture = discord.File(f)
-                            await ctx.send(file=picture)
                         await run() #инициализация проверки врагов в доке с условием выхода
                 else:
                     await imageworks.main_processor() #процесс автолока, проверки щитов у цели
