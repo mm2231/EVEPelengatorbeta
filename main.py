@@ -220,12 +220,10 @@ async def stop(ctx):
 
 @bot.command()
 async def starter(ctx): #Основной бот автоядра
-    first_module = (650, 497)
     global looping
     looping = True
     while looping:
         await asyncio.sleep(0.1)
-        #await speak(ctx, message="Погнали!")
         await ctx.send("Поехали")
         try:
             capture_screenshot()    # Здесь начинается магия с подменой 1.png
@@ -237,9 +235,9 @@ async def starter(ctx): #Основной бот автоядра
                 img1 = cv2.imread(previous_file)
                 img2 = cv2.imread(current_file)
                 diff = cv2.absdiff(img1, img2)
-                print(np.count_nonzero(diff))
+                #print(np.count_nonzero(diff))
                 if np.count_nonzero(diff) >= 175:
-                    print(f'Alarm!')
+                    #print(f'Alarm!')
                     tap_random(click_coords)
                     await ctx.send("Тревога!")
                     await ctx.send(np.count_nonzero(diff))
@@ -250,32 +248,9 @@ async def starter(ctx): #Основной бот автоядра
                         with open('screenshot.png', 'rb') as f:
                             picture = discord.File(f)
                             await ctx.send(file=picture)
-                        continue
-                    return
+                        await run() #инициализация проверки врагов в доке с условием выхода
                 else:
-                    image_path = "screenshot.png"
-                    img = cv2.imread(image_path)
-                    x = 926  # Координата x
-                    y = 214  # Координата y
-                    b, g, r = img[y, x]  # Получаем значения синего, зеленого и красного цветов пикселя
-                    r_min = 200  # Минимальное значение R
-                    g_max = 60  # Максимальное значение G
-                    b_max = 85  # Максимальное значение B
-                    #print("Значения RGB пикселя:", r, g, b)
-                    if r > r_min and g < g_max and b < b_max:
-                        #print("Лочим непись")
-                        await imageworks.processlock()
-                        image_path = "screenshot.png"
-                        img = cv2.imread(image_path)
-                        x = 929  # Координата x
-                        y = 56  # Координата y
-                        b, g, r = img[y, x]  # Получаем значения синего, зеленого и красного цветов пикселя
-                        r_min = 160  # Минимальное значение R
-                        g_max = 185  # Максимальное значение G
-                        b_max = 185  # Максимальное значение B
-                        # print("Значения RGB пикселя:", r, g, b)
-                        if r > r_min and g < g_max and b < b_max:
-                            await tap_random(first_module)
+                    await imageworks.main_processor() #процесс автолока, проверки щитов у цели
         except Exception as e:
             print("Произошла ошибка:")
             traceback.print_exc()
@@ -283,6 +258,28 @@ async def starter(ctx): #Основной бот автоядра
                 f.write("Произошла ошибка:\n")
                 f.write(traceback.format_exc())
         await asyncio.sleep(1)
+
+async def run(): #инициализация проверки врагов в доке с условием выхода
+    await asyncio.sleep(40)
+    capture_screenshot()
+    cv2.imwrite(current_file, imageworks.process_image('screenshot.png'))
+    img1 = cv2.imread(previous_file)
+    img2 = cv2.imread(current_file)
+    diff = cv2.absdiff(img1, img2)
+    # print(np.count_nonzero(diff))
+    if np.count_nonzero(diff) >= 175:
+        # print(f'Alarm!')
+        pass
+    else:
+        await adb.undock()
+        await asyncio.sleep(20)
+        await adb.zoom()
+        await asyncio.sleep(1)
+        await adb.pilot()
+        await asyncio.sleep(1)
+        await adb.core()
+        await asyncio.sleep(1)
+
 
 @bot.command()#Инициализация выхода из дока и подготовка к старту
 async def runner(ctx):
