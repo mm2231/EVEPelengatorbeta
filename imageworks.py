@@ -253,3 +253,31 @@ async def findwarp(): #найти варп
     keywords = "Warp,arp,war,WARP,War"
     await find(keywords)
 
+async def check_enemy_shield():
+    first_module = (650, 497)
+    image_path = "screenshot.png"
+    img = cv2.imread(image_path)
+    x = 929  # Координата x
+    y = 56  # Координата y
+    b, g, r = img[y, x]  # Получаем значения синего, зеленого и красного цветов пикселя
+    r_min = 160  # Минимальное значение R
+    g_max = 185  # Максимальное значение G
+    b_max = 185  # Максимальное значение B
+    # print("Значения RGB пикселя:", r, g, b)
+    if r > r_min and g < g_max and b < b_max:
+        await tap_random(first_module)
+
+async def main_processor():
+    image_path = "screenshot.png"
+    img = cv2.imread(image_path)
+    x = 926  # Координата x
+    y = 214  # Координата y
+    b, g, r = img[y, x]  # Получаем значения синего, зеленого и красного цветов пикселя
+    r_min = 200  # Минимальное значение R
+    g_max = 60  # Максимальное значение G
+    b_max = 85  # Максимальное значение B
+    # print("Значения RGB пикселя:", r, g, b)
+    if r > r_min and g < g_max and b < b_max:
+        # print("Лочим непись")
+        await processlock()
+        await check_enemy_shield()

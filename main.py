@@ -12,8 +12,7 @@ import pyttsx3
 from discord.ext import commands
 import adb
 import imageworks
-from adb import capture_screenshot, focus, tap_random, unload, undock, click_coords3, pilot, dock, openover, swipe, \
-    click_coords
+from adb import capture_screenshot, focus, tap_random, click_coords
 
 adb_path = r'platform-tools/adb.exe'
 intents = discord.Intents.all()
@@ -46,9 +45,9 @@ else:
 '''
 adb_devices_cmd = f"{adb_path} devices"
 output = subprocess.check_output(adb_devices_cmd.split()).decode()
-devices = output.strip().split("\n")[1:]'''
+devices = output.strip().split("\n")[1:]
 
-'''def select_device(devices):
+def select_device(devices):
     if len(devices) == 1:
         return devices[0].split("\t")[0]
     print("List of devices connected to ADB:")
@@ -219,65 +218,29 @@ async def stop(ctx):
         return
     await voice_client.disconnect()
 
-@bot.command()
-async def starter(ctx): #Основной бот автоядра
-    first_module = (650, 497)
+@bot.command() #Основной бот автоядра
+async def starter(ctx):
     global looping
     looping = True
     while looping:
         await asyncio.sleep(0.1)
-        #await speak(ctx, message="Погнали!")
         await ctx.send("Поехали")
         try:
-            capture_screenshot()    # Здесь начинается магия с подменой 1.png
+            capture_screenshot()
             cv2.imwrite(previous_file, imageworks.process_image('screenshot.png'))
             while looping:
                 await asyncio.sleep(0.1)
                 capture_screenshot()
-                cv2.imwrite(current_file, imageworks.process_image('screenshot.png'))
-                img1 = cv2.imread(previous_file)
-                img2 = cv2.imread(current_file)
-                diff = cv2.absdiff(img1, img2)
-                print(np.count_nonzero(diff))
-                if np.count_nonzero(diff) >= 175:
-                    print(f'Alarm!')
+                result = await imageworks.check_enemies()
+                if result:
                     tap_random(click_coords)
-                    #await speaker(ctx, message="Обнаружена угроза. Корабль направлен в док!")
                     await ctx.send("Тревога!")
-                    await ctx.send(np.count_nonzero(diff))
-                    cv2.imwrite('3.png', diff)
-                    with open('3.png', 'rb') as f:
+                    with open('screenshot.png', 'rb') as f:
                         picture = discord.File(f)
                         await ctx.send(file=picture)
-                        with open('screenshot.png', 'rb') as f:
-                            picture = discord.File(f)
-                            await ctx.send(file=picture)
-                        continue
-                    return
+                        await dock_detector() #инициализация проверки врагов в доке с условием выхода
                 else:
-                    image_path = "screenshot.png"
-                    img = cv2.imread(image_path)
-                    x = 926  # Координата x
-                    y = 214  # Координата y
-                    b, g, r = img[y, x]  # Получаем значения синего, зеленого и красного цветов пикселя
-                    r_min = 200  # Минимальное значение R
-                    g_max = 60  # Максимальное значение G
-                    b_max = 85  # Максимальное значение B
-                    #print("Значения RGB пикселя:", r, g, b)
-                    if r > r_min and g < g_max and b < b_max:
-                        #print("Лочим непись")
-                        await imageworks.processlock()
-                        image_path = "screenshot.png"
-                        img = cv2.imread(image_path)
-                        x = 929  # Координата x
-                        y = 56  # Координата y
-                        b, g, r = img[y, x]  # Получаем значения синего, зеленого и красного цветов пикселя
-                        r_min = 160  # Минимальное значение R
-                        g_max = 185  # Максимальное значение G
-                        b_max = 185  # Максимальное значение B
-                        # print("Значения RGB пикселя:", r, g, b)
-                        if r > r_min and g < g_max and b < b_max:
-                            await tap_random(first_module)
+                    await imageworks.main_processor() #процесс автолока, проверки щитов у цели
         except Exception as e:
             print("Произошла ошибка:")
             traceback.print_exc()
@@ -285,6 +248,32 @@ async def starter(ctx): #Основной бот автоядра
                 f.write("Произошла ошибка:\n")
                 f.write(traceback.format_exc())
         await asyncio.sleep(1)
+
+ #инициализация есконечного цикла проверки врагов в доке с условием выхода
+async def dock_detector():
+    global looping
+    looping = True
+    while looping:
+        await asyncio.sleep(30)
+        capture_screenshot()
+        result = await imageworks.check_enemies()
+        if result:
+            pass
+        else:
+            await adb.undock()
+            await asyncio.sleep(20)
+            await adb.zoom()
+            await asyncio.sleep(1)
+            await adb.pilot()
+            await asyncio.sleep(1)
+            await adb.core()
+            await asyncio.sleep(1)
+
+        if looping:
+            continue
+        else:
+            break
+
 
 @bot.command()#Инициализация выхода из дока и подготовка к старту
 async def runner(ctx):
@@ -361,8 +350,10 @@ async def grid(ctx):
                 vc = await voice_channel.connect()
             elif vc.channel != voice_channel:
                 await vc.move_to(voice_channel)
-            await speak(ctx, message="Внимание! Обнаружена угроза!")
-            await speak(ctx, message=text)
+            vc.play(discord.FFmpegPCMAudio('grid.mp3'))
+            while vc.is_playing():
+                await asyncio.sleep(1)
+            vc.is_playing()
         await asyncio.sleep(1)
 
 def play_text(ctx, vc, file):
