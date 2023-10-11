@@ -117,7 +117,7 @@ def add_grid_to_screenshot(screenshot_file, grid_size):
             center_x = (x1 + x2) // 2
             center_y = (y1 + y2) // 2
             cv2.putText(screenshot, f'{i * grid_size[1] + j}', (center_x - 10, center_y + 10),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.2, (0, 0, 255), 1)
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.3, (0, 0, 255), 1)
             globals()[f'coord_{i * grid_size[1] + j}'] = (center_x, center_y)
             cv2.rectangle(screenshot, (x1, y1), (x2, y2), (0, 255, 0), 1)
     cv2.imwrite('coords.png', screenshot)
