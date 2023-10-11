@@ -218,15 +218,15 @@ async def stop(ctx):
         return
     await voice_client.disconnect()
 
-@bot.command()
-async def starter(ctx): #Основной бот автоядра
+@bot.command() #Основной бот автоядра
+async def starter(ctx):
     global looping
     looping = True
     while looping:
         await asyncio.sleep(0.1)
         await ctx.send("Поехали")
         try:
-            capture_screenshot()    # Здесь начинается магия с подменой 1.png
+            capture_screenshot()
             cv2.imwrite(previous_file, imageworks.process_image('screenshot.png'))
             while looping:
                 await asyncio.sleep(0.1)
@@ -238,7 +238,7 @@ async def starter(ctx): #Основной бот автоядра
                     with open('screenshot.png', 'rb') as f:
                         picture = discord.File(f)
                         await ctx.send(file=picture)
-                        await run() #инициализация проверки врагов в доке с условием выхода
+                        await dock_detector() #инициализация проверки врагов в доке с условием выхода
                 else:
                     await imageworks.main_processor() #процесс автолока, проверки щитов у цели
         except Exception as e:
@@ -249,7 +249,8 @@ async def starter(ctx): #Основной бот автоядра
                 f.write(traceback.format_exc())
         await asyncio.sleep(1)
 
-async def run():
+ #инициализация есконечного цикла проверки врагов в доке с условием выхода
+async def dock_detector():
     global looping
     looping = True
     while looping:
