@@ -98,6 +98,21 @@ def tap_random(coords):
         [adb_path, '-s', device_id, 'shell', 'input', 'tap', str(random_x * image_width), str(random_y * image_height)],
         stdout=subprocess.DEVNULL)
 
+def tap_cortage(x, y):
+    capture_screenshot()
+    image = cv2.imread('screenshot.png')
+    image_height, image_width, _ = image.shape
+
+    prop_x = x / image_width
+    prop_y = y / image_height
+
+    random_x = random.uniform(prop_x - 0.01, prop_x + 0.01)
+    random_y = random.uniform(prop_y - 0.01, prop_y + 0.01)
+
+    subprocess.run(
+        [adb_path, '-s', device_id, 'shell', 'input', 'tap', str(random_x * image_width), str(random_y * image_height)],
+        stdout=subprocess.DEVNULL)
+
 def capture_screenshot():
     subprocess.run([adb_path, '-s', device_id, 'shell', 'screencap', '-p', '/sdcard/screenshot.png'])
     subprocess.run([adb_path, '-s', device_id, 'pull', '/sdcard/screenshot.png', './screenshot.png'],
