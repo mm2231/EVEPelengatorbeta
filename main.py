@@ -225,7 +225,7 @@ async def undock(ctx):
     await adb.undock()
     await ctx.send("Андокаюсь")
 
-@bot.command() #Отсановить все циклы и  отключить от voice бота
+@bot.command() #Остановить все циклы и  отключить от voice бота
 async def stop(ctx):
     global looping
     looping = False
