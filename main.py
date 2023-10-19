@@ -1,4 +1,5 @@
 import asyncio
+import psutil
 import os
 import subprocess
 import sys
@@ -129,6 +130,11 @@ async def devices(ctx):
         await ctx.send(f"Список устройств ADB:\n{devices_output}")
     except Exception as e:
         await ctx.send(f"Ошибка при получении списка устройств ADB: {e}")
+
+def get_system_stats():
+    cpu_load = psutil.cpu_percent(interval=1)
+    memory_usage = psutil.virtual_memory().percent
+    return cpu_load, memory_usage
 
 @bot.command()
 async def starteve(ctx):
@@ -369,7 +375,10 @@ async def grid(ctx):
 
 @bot.command() #Текущий статус бота по глобальным флагам
 async def status(ctx):
+    cpu_load, memory_usage = get_system_stats()
     await ctx.send(current_status)
+    await ctx.send(f"Текущая загрузка ЦПУ: {cpu_load}%")
+    await ctx.send(f"Текущее использование оперативной памяти: {memory_usage}%")
     #await speak(ctx, message=current_status)
 
 @bot.command() #получение комбинированного актуального изображения в дискорд канал
