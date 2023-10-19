@@ -225,7 +225,7 @@ async def undock(ctx):
     await adb.undock()
     await ctx.send("Андокаюсь")
 
-@bot.command() #Остановить все циклы и  отключить от voice бота
+@bot.command() #Остановить все циклы и отключить от voice бота
 async def stop(ctx):
     global looping
     looping = False
@@ -508,23 +508,23 @@ async def processorder(ctx):
     buy = (793, 468)
     tapcalculate = (540, 217)
     pcs = (589, 284)
-    order = (480, 468)
-####################################################################
-    await asyncio.sleep(3)
+    order = (480, 468)####################################################################
+    await asyncio.sleep(4)
     capture_screenshot()
-    await asyncio.sleep(1)
+    await asyncio.sleep(2)
     crop()
-    await asyncio.sleep(1)
+    await asyncio.sleep(3)
     price_text = extract()
+    print(f"price_text: {price_text}")
     price_number = float(price_text.replace(',', '.').split('.')[0])
     seventy_percent = int(price_number * 0.7)
     margin = int(price_number * 0.15)
     with open('Name.png', 'rb') as f:
         picture = discord.File(f)
-        await ctx.send(file=picture)
+    await ctx.send(file=picture)
     await ctx.send(f"Текущая цена: {price_text}")
     await ctx.send(f"Устанавливаемая цена: {seventy_percent}")
-    await ctx.send(f"Предпологаемая маржа: {margin}")
+    await ctx.send(f"Предполагаемая маржа: {margin}")
     '''
     tap_random(buyclick)
     await asyncio.sleep(2)
@@ -554,9 +554,9 @@ async def trade(ctx):
     item_07 = (682, 267)
     item_08 = (863, 269)
     tap_random(marketclick)
-    await asyncio.sleep(2)
+    await asyncio.sleep(4)
     tap_random(favorites)
-    await asyncio.sleep(1)
+    await asyncio.sleep(3)
     tap_random(item_01)             ############################## Отсчетная точка
     await processorder(ctx)
 
@@ -571,7 +571,6 @@ if __name__ == "__main__":
     else:
         print("Значение token не найдено.")
     bot.run(token)
-
 
 ##MTE0MjQxMDg2OTMyMjU2MzU5NA.GrWfeF.EwM5X7ZimEonI01IimlOtmO4Zu1jzHGbfluvDc ZLATA
 ##MTA5NDk0NzQzMzczMTA4NDM4OA.Gd6cRT.gx0rSe4vo8Q9dA4nMkpDq144XrWWyeTsqmslP4 MY
