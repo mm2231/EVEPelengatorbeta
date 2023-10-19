@@ -29,7 +29,7 @@ current_status = 'Бот в режиме ожидания'
 looping = False
 mining = False
 voice_client = None
-voicechannel = None #1155398920936108122 zlata 1143557824429961352 my
+voicechannel = None
 device_id = None
 token = None
 
@@ -231,11 +231,7 @@ async def stop(ctx):
     looping = False
     await ctx.send("Отключаюсь")
     #await speak(ctx, message="Отключаюсь!")
-    voice_client = ctx.voice_client
-    if voice_client is None:
-        return
-    await voice_client.disconnect()
-
+'''
 @bot.command() #Основной бот автоядра
 async def starter(ctx):
     global looping
@@ -303,7 +299,7 @@ async def runner(ctx):
     await asyncio.sleep(1)
     await ctx.send("Подготовка к старту выполнена, высылаю скриншот для проверки")
     await screen(ctx)
-
+'''
 ############################################################## мониторинг, локалбот
 
 def capture_screenshot():
@@ -370,9 +366,6 @@ async def grid(ctx):
                 await asyncio.sleep(1)
             vc.is_playing()
         await asyncio.sleep(1)
-
-def play_text(ctx, vc, file):
-     vc.play(discord.FFmpegPCMAudio(file), after=lambda e: print('done', e))
 
 @bot.command() #Текущий статус бота по глобальным флагам
 async def status(ctx):
@@ -464,6 +457,7 @@ async def speak(ctx, *, message):
     while voice_client.is_playing():
         await asyncio.sleep(1)
 
+'''
 ############################################################## trade
 
 number_coordinates = {
@@ -525,7 +519,6 @@ async def processorder(ctx):
     await ctx.send(f"Текущая цена: {price_text}")
     await ctx.send(f"Устанавливаемая цена: {seventy_percent}")
     await ctx.send(f"Предполагаемая маржа: {margin}")
-    '''
     tap_random(buyclick)
     await asyncio.sleep(2)
     tap_random(buy)
@@ -539,7 +532,7 @@ async def processorder(ctx):
     tap_random(order)
     await asyncio.sleep(1)
     tap_random(close)
-    '''
+
 
 @bot.command()
 async def trade(ctx):
@@ -559,6 +552,7 @@ async def trade(ctx):
     await asyncio.sleep(3)
     tap_random(item_01)             ############################## Отсчетная точка
     await processorder(ctx)
+'''
 
 if __name__ == "__main__":
     with open(config_file, 'r') as file:
@@ -572,6 +566,3 @@ if __name__ == "__main__":
         print("Значение token не найдено.")
     bot.run(token)
 
-##MTE0MjQxMDg2OTMyMjU2MzU5NA.GrWfeF.EwM5X7ZimEonI01IimlOtmO4Zu1jzHGbfluvDc ZLATA
-##MTA5NDk0NzQzMzczMTA4NDM4OA.Gd6cRT.gx0rSe4vo8Q9dA4nMkpDq144XrWWyeTsqmslP4 MY
-##MTE1NTQxMzA3NjEzNzQ5NjU4Ng.GfOopR.WO9pUDoVd4JSV-lIzrHc0FedE2Fa9YCmnzEPe0 zlata3
