@@ -2,6 +2,7 @@ import subprocess
 import asyncio
 import random
 import cv2
+import adb
 import discord
 from discord.ext import commands
 intents = discord.Intents.all()
@@ -81,6 +82,20 @@ if not device_id:
 else:
     print("Подключился...")
 '''
+
+def check_device_connection(device_id):
+    result = subprocess.run([adb_path, '-s', device_id, 'devices'], capture_output=True, text=True)
+    output = result.stdout.strip()
+    if f"{device_id}\tdevice" in output:
+        return True
+    return False
+
+def check_app_running(device_id):
+    result = subprocess.run([adb_path, '-s', device_id, 'shell', 'dumpsys', 'window', 'windows'], capture_output=True, text=True)
+    output = result.stdout.strip()
+    if "com.netease.eve.en" in output:  # замените "YourAppName" на имя вашего приложения
+        return True
+    return False
 
 #старая версия под эмулятор
 def tap_random(coords):

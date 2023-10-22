@@ -12,6 +12,7 @@ import pytesseract
 import pyttsx3
 from discord.ext import commands
 import adb
+import pygetwindow as gw
 import imageworks
 from adb import capture_screenshot, tap_random, click_coords
 
@@ -26,7 +27,7 @@ crop_dx1, crop_dy1, crop_dx2, crop_dy2 = 373, 170, 550, 197    #корабль
 crop_cx1, crop_cy1, crop_cx2, crop_cy2 = 373, 143, 550, 169    #никнейм
 local_file = 'local.png'
 config_file = 'config.txt'
-current_status = 'Бот в режиме ожидания'
+current_status = 'Ожидание команды'
 looping = False
 mining = False
 voice_client = None
@@ -92,7 +93,6 @@ async def restartadb(ctx):
         await ctx.send("Сервер adb успешно перезапущен.")
         await devices(ctx)
 
-
 @bot.command()
 async def matrix(ctx):
     capture_screenshot()
@@ -148,7 +148,15 @@ async def devices(ctx):
 def get_system_stats():
     cpu_load = psutil.cpu_percent(interval=1)
     memory_usage = psutil.virtual_memory().percent
-    return cpu_load, memory_usage
+
+    active_windows = []
+
+    for window in gw.getAllTitles():
+        if "BlueStacks App Player" in window:
+            active_windows.append(window)
+            windows_column = '\n'.join(active_windows)
+
+    return cpu_load, memory_usage, windows_column
 
 @bot.command()
 async def starteve(ctx):
@@ -327,14 +335,20 @@ def capture_screenshot():
     subprocess.run([adb_path, '-s', device_id, 'pull', '/sdcard/screenshot.png', './screenshot.png'],
                    stdout=subprocess.DEVNULL)
 
-@bot.command() #Запуск функции мониторинга с флагом перехода в мониторинг грида при True
+@bot.command()
 async def start(ctx):
-    #await speak(ctx, message="Запускаю мониторинг!")
+    device_id = "emulator-5574"
     global current_status
     global looping
     print('Запускаю цикл скринов')
     looping = True
     while looping:
+        connected = adb.check_device_connection(device_id)
+        app_running = adb.check_app_running(device_id)
+        if not connected or not app_running:
+            await ctx.send('Ошибка подключения, проверьте эмулятор и игровой клиент')
+            break
+
         capture_screenshot()
         await asyncio.sleep(0.5)
         image = cv2.imread('screenshot.png')
@@ -349,14 +363,14 @@ async def start(ctx):
         imageworks.add_watermark(local_file)
         result = await imageworks.check_enemies()
         if result:
-            current_status = 'запущен цикл, угроза безопасности в системе'
+            current_status = 'запущен мониторинг, угроза безопасности в системе'
             await asyncio.sleep(1.5)
             grid_result = await grid(ctx)
             if grid_result:
                 await ctx.send(file=discord.File('local.png'))
                 break
         else:
-            current_status = 'запущен цикл, угроз не обнаружено'
+            current_status = 'запущен мониторинг, угроз не обнаружено'
             grid_result = False
 
 #Обработка грида овервью
@@ -390,10 +404,11 @@ async def grid(ctx):
 
 @bot.command() #Текущий статус бота по глобальным флагам
 async def status(ctx):
-    cpu_load, memory_usage = get_system_stats()
-    await ctx.send(current_status)
-    await ctx.send(f"Текущая загрузка ЦПУ: {cpu_load}%")
-    await ctx.send(f"Текущее использование оперативной памяти: {memory_usage}%")
+    cpu_load, memory_usage, windows_column = get_system_stats()
+    await ctx.send(f"Текущий статус мониторинга: {current_status}")
+    await ctx.send(f"Загрузка ЦПУ: {cpu_load}%")
+    await ctx.send(f"Использовано оперативной памяти: {memory_usage}%")
+    await ctx.send(f"Запущенные эмуляторы: \n{windows_column}")
     #await speak(ctx, message=current_status)
 
 @bot.command() #получение комбинированного актуального изображения в дискорд канал
