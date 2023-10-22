@@ -332,6 +332,7 @@ async def start(ctx):
         imgh = cv2.resize(imgh, dsize)
         result = cv2.vconcat([img3, imgh])
         cv2.imwrite(local_file, result)
+        imageworks.add_watermark(local_file)
         result = await imageworks.check_enemies()
         if result:
             current_status = 'запущен цикл, угроза безопасности в системе'

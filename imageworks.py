@@ -1,4 +1,10 @@
 import asyncio
+import datetime
+from datetime import datetime
+from PIL import Image
+from PIL import ImageDraw
+from PIL import ImageFont
+import PIL
 import pytesseract
 import cv2
 import numpy as np
@@ -281,3 +287,11 @@ async def main_processor():
         # print("Лочим непись")
         await processlock()
         await check_enemy_shield()
+
+def add_watermark(image_path):
+    img = PIL.Image.open(image_path)
+    draw = PIL.ImageDraw.Draw(img)
+    font = PIL.ImageFont.truetype('eve.ttf', size=30)
+    time_str = datetime.now().strftime("%d-%m-%y %H:%M:%S")
+    draw.text((50, 50), time_str, font=font, fill=(255, 255, 255, 128))
+    img.save(image_path)
