@@ -80,6 +80,20 @@ else:
 #system functions
 
 @bot.command()
+async def restartadb(ctx):
+    if looping:
+        await ctx.send("Нельзя перезапускать сервер при работе цикла start, отключите мониторинг")
+    else:
+        await ctx.send("Инициализирую перезагрузку сервера ADB. Ожидайте!")
+        subprocess.run([adb_path, 'kill-server'])
+        await asyncio.sleep(1)
+        subprocess.run([adb_path, 'start-server'])
+        await asyncio.sleep(20)
+        await ctx.send("Сервер adb успешно перезапущен.")
+        await devices(ctx)
+
+
+@bot.command()
 async def matrix(ctx):
     capture_screenshot()
     adb.add_grid_to_screenshot('screenshot.png', (25, 15))
@@ -405,6 +419,14 @@ async def showfiles(ctx):
         diff = cv2.absdiff(img1, img2)
         nonzero_count = np.count_nonzero(diff)
         await ctx.send(f"Различие пикселей: {nonzero_count}")
+
+@bot.command()
+async def diff(ctx):
+    img1 = cv2.imread(previous_file)
+    img2 = cv2.imread(current_file)
+    diff = cv2.absdiff(img1, img2)
+    nonzero_count = np.count_nonzero(diff)
+    await ctx.send(f"Текущее различие пикселей: {nonzero_count}, порог срабатывания:175")
 
 @bot.command() #починить изображения способом подмены
 async def repairimages(ctx):
