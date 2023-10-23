@@ -129,7 +129,6 @@ def read_channels_from_config():
         for line in file:
             if 'channels' in line:
                 channels = line.split('=')[1].strip().split(',')
-    print(channels)
     return channels
 
 async def send_message_to_channels(bot, channels, file):
@@ -358,40 +357,43 @@ async def start(ctx):
     channels = read_channels_from_config()
     global current_status
     global looping
-    print('Запускаю цикл скринов')
     looping = True
     while looping:
         connected = adb.check_device_connection(device_id)
         app_running = adb.check_app_running(device_id)
-        if not connected or not app_running:
-            await ctx.send('Ошибка подключения, проверьте эмулятор и игровой клиент')
+        if not connected:
+            await ctx.send('Ошибка подключения к эмулятору')
             break
-        capture_screenshot()
-        await asyncio.sleep(1)
-        image = cv2.imread('screenshot.png')
-        img1 = image[crop_coordss[0][0]:crop_coordss[0][1], crop_coordss[0][2]:crop_coordss[0][3]]
-        img2 = image[crop_coordss[1][0]:crop_coordss[1][1], crop_coordss[1][2]:crop_coordss[1][3]]
-        img3 = image[crop_coordss[2][0]:crop_coordss[2][1], crop_coordss[2][2]:crop_coordss[2][3]]
-        imgh = cv2.hconcat([img2, img1])
-        dsize = (618, 423)
-        imgh = cv2.resize(imgh, dsize)
-        result = cv2.vconcat([img3, imgh])
-        cv2.imwrite(local_file, result)
-        imageworks.add_watermark(local_file)
-        result = await imageworks.check_enemies()
-        if result:
-            current_status = 'запущен мониторинг, угроза безопасности в системе'
-            await asyncio.sleep(1.5)
-            grid_result = await grid(ctx)
-            if grid_result:
-                for channel_id in channels:
-                    channel = bot.get_channel(int(channel_id))
-                    if channel:
-                        await channel.send(file=discord.File(local_file))
-                break
+        elif not app_running:
+            await ctx.send('Ошибка подключения к игровому клиенту')
+            break
         else:
-            current_status = 'запущен мониторинг, угроз не обнаружено'
-            grid_result = False
+            capture_screenshot()
+            await asyncio.sleep(1)
+            image = cv2.imread('screenshot.png')
+            img1 = image[crop_coordss[0][0]:crop_coordss[0][1], crop_coordss[0][2]:crop_coordss[0][3]]
+            img2 = image[crop_coordss[1][0]:crop_coordss[1][1], crop_coordss[1][2]:crop_coordss[1][3]]
+            img3 = image[crop_coordss[2][0]:crop_coordss[2][1], crop_coordss[2][2]:crop_coordss[2][3]]
+            imgh = cv2.hconcat([img2, img1])
+            dsize = (618, 423)
+            imgh = cv2.resize(imgh, dsize)
+            result = cv2.vconcat([img3, imgh])
+            cv2.imwrite(local_file, result)
+            imageworks.add_watermark(local_file)
+            result = await imageworks.check_enemies()
+            if result:
+                current_status = 'запущен мониторинг, угроза безопасности в системе'
+                await asyncio.sleep(1.5)
+                grid_result = await grid(ctx)
+                if grid_result:
+                    for channel_id in channels:
+                        channel = bot.get_channel(int(channel_id))
+                        if channel:
+                            await channel.send(file=discord.File(local_file))
+                    break
+            else:
+                current_status = 'запущен мониторинг, угроз не обнаружено'
+                grid_result = False
 
 #Обработка грида овервью
 async def grid(ctx):
