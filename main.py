@@ -34,6 +34,7 @@ voice_client = None
 voicechannel = None
 device_id = None
 token = None
+channels = None
 
 with open(config_file, 'r') as file:
     for line in file:
@@ -79,7 +80,6 @@ else:
     print("Connected to the emulator...")'''
 
 #system functions
-
 @bot.command()
 async def restartadb(ctx):
     if looping:
@@ -121,17 +121,35 @@ def get_voice_channel_id():
 
     return int(voicechannel) if voicechannel else None
 
+def read_channels_from_config():
+    config_file = 'config.txt'
+    channels = []
+
+    with open(config_file, 'r') as file:
+        for line in file:
+            if 'channels' in line:
+                channels = line.split('=')[1].strip().split(',')
+    print(channels)
+    return channels
+
+async def send_message_to_channels(bot, channels, file):
+    for channel_id in channels:
+        channel = bot.get_channel(channel_id)
+        if channel:
+            await channel.send(file=file)
+
 @bot.event
 async def on_ready():
+    capture_screenshot()
     print(f'Погнали!')
 
     voicechannel = get_voice_channel_id()
 
     if voicechannel is not None:
         voice_channel = bot.get_channel(voicechannel)
-        vc = voice_client
+        vc = None
 
-        if not vc:
+        if vc is None:
             vc = await voice_channel.connect()
         elif vc.channel != voice_channel:
             await vc.move_to(voice_channel)
@@ -337,7 +355,7 @@ def capture_screenshot():
 
 @bot.command()
 async def start(ctx):
-    device_id = "emulator-5574"
+    channels = read_channels_from_config()
     global current_status
     global looping
     print('Запускаю цикл скринов')
@@ -348,9 +366,8 @@ async def start(ctx):
         if not connected or not app_running:
             await ctx.send('Ошибка подключения, проверьте эмулятор и игровой клиент')
             break
-
         capture_screenshot()
-        await asyncio.sleep(0.5)
+        await asyncio.sleep(1)
         image = cv2.imread('screenshot.png')
         img1 = image[crop_coordss[0][0]:crop_coordss[0][1], crop_coordss[0][2]:crop_coordss[0][3]]
         img2 = image[crop_coordss[1][0]:crop_coordss[1][1], crop_coordss[1][2]:crop_coordss[1][3]]
@@ -367,7 +384,10 @@ async def start(ctx):
             await asyncio.sleep(1.5)
             grid_result = await grid(ctx)
             if grid_result:
-                await ctx.send(file=discord.File('local.png'))
+                for channel_id in channels:
+                    channel = bot.get_channel(int(channel_id))
+                    if channel:
+                        await channel.send(file=discord.File(local_file))
                 break
         else:
             current_status = 'запущен мониторинг, угроз не обнаружено'
@@ -375,6 +395,7 @@ async def start(ctx):
 
 #Обработка грида овервью
 async def grid(ctx):
+    channels = read_channels_from_config()
     img = cv2.imread('local.png')
     img_cropped1 = img[crop_dy1:crop_dy2, crop_dx1:crop_dx2]
     cv2.imwrite('grid.png', img_cropped1)
@@ -387,19 +408,24 @@ async def grid(ctx):
         if text:
             print("Обнаружен террорист: ", text)
             cv2.imwrite('ocrresult.png', img2)
-            await ctx.send(file=discord.File('local.png'))
+            for channel_id in channels:
+                channel = bot.get_channel(int(channel_id))
+                if channel:
+                    await channel.send(file=discord.File(local_file))
+                    await channel.send(f'{text}')
             await asyncio.sleep(0.5)
-            await ctx.send(f'{text}')
-            voice_channel = bot.get_channel(voicechannel)
-            vc = ctx.voice_client
-            if not vc:
-                vc = await voice_channel.connect()
-            elif vc.channel != voice_channel:
-                await vc.move_to(voice_channel)
-            vc.play(discord.FFmpegPCMAudio('grid.mp3'))
-            while vc.is_playing():
-                await asyncio.sleep(1)
-            vc.is_playing()
+            voice_channel_id = get_voice_channel_id()
+            if voice_channel_id:
+                voice_channel = bot.get_channel(voice_channel_id)
+                vc = ctx.voice_client
+                if not vc:
+                    vc = await voice_channel.connect()
+                elif vc.channel != voice_channel:
+                    await vc.move_to(voice_channel)
+                vc.play(discord.FFmpegPCMAudio('grid.mp3'))
+                while vc.is_playing():
+                    await asyncio.sleep(1)
+                vc.stop()
         await asyncio.sleep(1)
 
 @bot.command() #Текущий статус бота по глобальным флагам

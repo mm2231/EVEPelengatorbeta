@@ -1,3 +1,4 @@
-device_id = emulator-5574
+device_id = emulator-5554
 token = MTA5NDk0NzQzMzczMTA4NDM4OA.Gd6cRT.gx0rSe4vo8Q9dA4nMkpDq144XrWWyeTsqmslP4
 voicechannel = 1164538215282249811
+channels = 1164538153961529444,795969501124362272
