@@ -200,7 +200,7 @@ async def closeeve(ctx):
 @bot.command()
 async def restart(ctx):
     await ctx.send("Перезагрузка скрипта, все функции отключены")
-    subprocess.Popen([sys.executable, "restart_script.py"], creationflags=subprocess.CREATE_NEW_CONSOLE)
+    subprocess.Popen([sys.executable, "restart_script.py"], shell=True)
     await bot.close()
 
 @bot.command()
