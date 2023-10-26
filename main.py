@@ -81,6 +81,12 @@ else:
 
 #system functions
 @bot.command()
+async def system(ctx):
+    cpu_load, memory_usage, windows_column = get_system_stats()
+    await ctx.send(f"Загрузка ЦПУ: {cpu_load}%")
+    await ctx.send(f"Использовано оперативной памяти: {memory_usage}%")
+    await ctx.send(f"Запущенные эмуляторы: \n{windows_column}")
+@bot.command()
 async def restartadb(ctx):
     if looping:
         await ctx.send("Нельзя перезапускать сервер при работе цикла start, отключите мониторинг")
@@ -287,6 +293,7 @@ async def stop(ctx):
     looping = False
     await ctx.send("Отключаюсь")
     #await speak(ctx, message="Отключаюсь!")
+
 '''
 @bot.command() #Основной бот автоядра
 async def starter(ctx):
@@ -393,7 +400,7 @@ async def start(ctx):
             imageworks.add_watermark(local_file)
             result = await imageworks.check_enemies()
             if result:
-                current_status = 'запущен мониторинг, угроза безопасности в системе'
+                current_status = 'Угроза безопасности'
                 await asyncio.sleep(0.5)
                 grid_result = await grid(ctx)
                 if grid_result:
@@ -403,7 +410,7 @@ async def start(ctx):
                             await channel.send(file=discord.File(local_file))
                     break
             else:
-                current_status = 'запущен мониторинг, угроз не обнаружено'
+                current_status = 'Угроз не обнаружено'
                 grid_result = False
 
 #Обработка грида овервью
@@ -443,11 +450,7 @@ async def grid(ctx):
 
 @bot.command() #Текущий статус бота по глобальным флагам
 async def status(ctx):
-    cpu_load, memory_usage, windows_column = get_system_stats()
     await ctx.send(f"Текущий статус мониторинга: {current_status}")
-    await ctx.send(f"Загрузка ЦПУ: {cpu_load}%")
-    await ctx.send(f"Использовано оперативной памяти: {memory_usage}%")
-    await ctx.send(f"Запущенные эмуляторы: \n{windows_column}")
     #await speak(ctx, message=current_status)
 
 @bot.command() #получение комбинированного актуального изображения в дискорд канал
@@ -480,7 +483,7 @@ async def diff(ctx):
     img2 = cv2.imread(current_file)
     diff = cv2.absdiff(img1, img2)
     nonzero_count = np.count_nonzero(diff)
-    await ctx.send(f"Текущее различие пикселей: {nonzero_count}, порог срабатывания:175")
+    await ctx.send(f"Различие пикселей: {nonzero_count}, порог:175")
 
 @bot.command() #починить изображения способом подмены
 async def repairimages(ctx):
