@@ -543,6 +543,17 @@ async def speak(ctx, *, message):
     while voice_client.is_playing():
         await asyncio.sleep(1)
 
+@bot.command()
+async def play(ctx):
+    if not ctx.author.voice:
+        await ctx.send("Вы не находитесь в голосовом канале.")
+        return
+    voice_channel = ctx.author.voice.channel
+    voice_client = ctx.voice_client
+    if not voice_client:
+        voice_client = await voice_channel.connect()
+    voice_client.play(discord.FFmpegPCMAudio('grid.mp3'), after=lambda e: print('done', e))
+
 '''
 ############################################################## trade
 
