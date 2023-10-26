@@ -169,7 +169,7 @@ def get_system_stats():
     active_windows = []
 
     for window in gw.getAllTitles():
-        if "BlueStacks App Player" in window:
+        if "BlueStacks" in window:
             active_windows.append(window)
             windows_column = '\n'.join(active_windows)
 
@@ -222,6 +222,17 @@ async def screen(ctx):
     with open('screenmin.png', 'rb') as f:
         image = discord.File(f, filename='screenmin.png')
         await ctx.send(file=image)
+
+@bot.command()
+async def play(ctx):
+    if not ctx.author.voice:
+        await ctx.send("Вы не находитесь в голосовом канале.")
+        return
+    voice_channel = ctx.author.voice.channel
+    voice_client = ctx.voice_client
+    if not voice_client:
+        voice_client = await voice_channel.connect()
+    voice_client.play(discord.FFmpegPCMAudio('grid.mp3'), after=lambda e: print('done', e))
 
 ####################################################BOT AI
 
@@ -383,7 +394,7 @@ async def start(ctx):
             result = await imageworks.check_enemies()
             if result:
                 current_status = 'запущен мониторинг, угроза безопасности в системе'
-                await asyncio.sleep(1.5)
+                await asyncio.sleep(0.5)
                 grid_result = await grid(ctx)
                 if grid_result:
                     for channel_id in channels:
@@ -428,7 +439,7 @@ async def grid(ctx):
                 while vc.is_playing():
                     await asyncio.sleep(1)
                 vc.stop()
-        await asyncio.sleep(1)
+        await asyncio.sleep(0.5)
 
 @bot.command() #Текущий статус бота по глобальным флагам
 async def status(ctx):
