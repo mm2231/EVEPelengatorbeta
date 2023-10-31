@@ -133,29 +133,6 @@ def capture_screenshot():
     subprocess.run([adb_path, '-s', device_id, 'pull', '/sdcard/screenshot.png', './screenshot.png'],
                    stdout=subprocess.DEVNULL)
 
-def add_grid_to_screenshot(screenshot_file, grid_size):
-    screenshot = cv2.imread(screenshot_file)
-    height, width, _ = screenshot.shape
-    square_width = width // grid_size[0]
-    square_height = height // grid_size[1]
-    for i in range(grid_size[0]):
-        for j in range(grid_size[1]):
-            x1 = i * square_width
-            y1 = j * square_height
-            x2 = (i + 1) * square_width
-            y2 = (j + 1) * square_height
-            center_x = (x1 + x2) // 2
-            center_y = (y1 + y2) // 2
-            cv2.putText(screenshot, f'{i * grid_size[1] + j}', (center_x - 10, center_y + 10),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.3, (0, 0, 255), 1)
-            globals()[f'coord_{i * grid_size[1] + j}'] = (center_x, center_y)
-            cv2.rectangle(screenshot, (x1, y1), (x2, y2), (0, 255, 0), 1)
-    cv2.imwrite('coords.png', screenshot)
-
-def click_on_coordinate(coord_number):
-    center_x, center_y = globals()[f'coord_{coord_number}']
-    tap_random((center_x, center_y))
-
 async def lock():
     tap_random(click_coords2)
     delay = random.uniform(1, 3)

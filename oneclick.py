@@ -809,6 +809,38 @@ coordinates = (757, 45, 912, 300)  # Пример координат (x, y, ши
 
 process_regions(image_path, coordinates)
 
+@bot.command() #Основной бот автоядра
+async def starter(ctx):
+    global looping
+    looping = True
+    while looping:
+        await asyncio.sleep(0.1)
+        await ctx.send("Поехали")
+        try:
+            capture_screenshot()
+            cv2.imwrite(previous_file, imageworks.process_image('screenshot.png'))
+            while looping:
+                await asyncio.sleep(0.5)
+                capture_screenshot()
+                result = await imageworks.check_enemies()
+                if result:
+                    tap_random(click_coords)
+                    await ctx.send("Тревога!")
+                    with open('screenshot.png', 'rb') as f:
+                        picture = discord.File(f)
+                        await ctx.send(file=picture)
+                        await dock_detector() #инициализация проверки врагов в доке с условием выхода
+                else:
+                    await imageworks.main_processor() #процесс автолока, проверки щитов у цели
+        except Exception as e:
+            print("Произошла ошибка:")
+            traceback.print_exc()
+            with open("error_log.txt", "a") as f:
+                f.write("Произошла ошибка:\n")
+                f.write(traceback.format_exc())
+        await asyncio.sleep(1)
+
+
 if __name__ == "__main__":
     with open("auth.txt", "r") as file:
         token = auth_data[2]

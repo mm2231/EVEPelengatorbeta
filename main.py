@@ -102,16 +102,39 @@ async def restartadb(ctx):
 @bot.command()
 async def matrix(ctx):
     capture_screenshot()
-    adb.add_grid_to_screenshot('screenshot.png', (25, 15))
+    add_grid_to_screenshot('screenshot.png', (25, 15))
     with open('coords.png', 'rb') as f:
         image = discord.File(f, filename='coords.png')
         await ctx.send(file=image)
+
+def add_grid_to_screenshot(screenshot_file, grid_size):
+    screenshot = cv2.imread(screenshot_file)
+    height, width, _ = screenshot.shape
+    square_width = width // grid_size[0]
+    square_height = height // grid_size[1]
+    for i in range(grid_size[0]):
+        for j in range(grid_size[1]):
+            x1 = i * square_width
+            y1 = j * square_height
+            x2 = (i + 1) * square_width
+            y2 = (j + 1) * square_height
+            center_x = (x1 + x2) // 2
+            center_y = (y1 + y2) // 2
+            cv2.putText(screenshot, f'{i * grid_size[1] + j}', (center_x - 10, center_y + 10),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.3, (0, 0, 255), 1)
+            globals()[f'coord_{i * grid_size[1] + j}'] = (center_x, center_y)
+            cv2.rectangle(screenshot, (x1, y1), (x2, y2), (0, 255, 0), 1)
+    cv2.imwrite('coords.png', screenshot)
+
+def click_on_coordinate(coord_number):
+    center_x, center_y = globals()[f'coord_{coord_number}']
+    tap_random((center_x, center_y))
 
 @bot.command()
 async def tap(ctx, square_number):
     square_number = int(square_number)
     if f'coord_{square_number}' in globals():
-        adb.click_on_coordinate(square_number)
+        click_on_coordinate(square_number)
         await ctx.send('Клик по квадрату выполнен')
     else:
         await ctx.send('Неверный номер квадрата')
@@ -294,7 +317,6 @@ async def stop(ctx):
     await ctx.send("Отключаюсь")
     #await speak(ctx, message="Отключаюсь!")
 
-'''
 @bot.command() #Основной бот автоядра
 async def starter(ctx):
     global looping
@@ -362,7 +384,7 @@ async def runner(ctx):
     await asyncio.sleep(1)
     await ctx.send("Подготовка к старту выполнена, высылаю скриншот для проверки")
     await screen(ctx)
-'''
+
 ############################################################## мониторинг, локалбот
 
 def capture_screenshot():
@@ -546,7 +568,7 @@ async def speak(ctx, *, message):
     while voice_client.is_playing():
         await asyncio.sleep(1)
 
-@bot.command()
+''''@bot.command()
 async def play(ctx):
     if not ctx.author.voice:
         await ctx.send("Вы не находитесь в голосовом канале.")
@@ -555,7 +577,7 @@ async def play(ctx):
     voice_client = ctx.voice_client
     if not voice_client:
         voice_client = await voice_channel.connect()
-    voice_client.play(discord.FFmpegPCMAudio('grid.mp3'), after=lambda e: print('done', e))
+    voice_client.play(discord.FFmpegPCMAudio('grid.mp3'), after=lambda e: print('done', e))'''
 
 '''
 ############################################################## trade
