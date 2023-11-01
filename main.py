@@ -321,12 +321,12 @@ async def stop(ctx):
 async def starter(ctx):
     global looping
     looping = True
+    capture_screenshot()
+    cv2.imwrite(previous_file, imageworks.process_image('screenshot.png'))
     while looping:
         await asyncio.sleep(0.1)
-        await ctx.send("Поехали")
+        #await ctx.send("Поехали")
         try:
-            capture_screenshot()
-            cv2.imwrite(previous_file, imageworks.process_image('screenshot.png'))
             while looping:
                 await asyncio.sleep(0.5)
                 capture_screenshot()
@@ -337,7 +337,7 @@ async def starter(ctx):
                     with open('screenshot.png', 'rb') as f:
                         picture = discord.File(f)
                         await ctx.send(file=picture)
-                        await dock_detector() #инициализация проверки врагов в доке с условием выхода
+                        #await dock_detector() #инициализация проверки врагов в доке с условием выхода
                 else:
                     await imageworks.main_processor() #процесс автолока, проверки щитов у цели
         except Exception as e:
@@ -348,7 +348,7 @@ async def starter(ctx):
                 f.write(traceback.format_exc())
         await asyncio.sleep(1)
 
- #инициализация есконечного цикла проверки врагов в доке с условием выхода
+ #инициализация бесконечного цикла проверки врагов в доке с условием выхода
 async def dock_detector():
     global looping
     looping = True
