@@ -1,5 +1,5 @@
 import asyncio
-#import psutil
+import psutil
 import os
 import subprocess
 import sys
@@ -311,6 +311,11 @@ async def undock(ctx):
     await adb.undock()
     await ctx.send("Андокаюсь")
 
+@bot.command()
+async def roll(ctx):
+    await adb.nanocore()
+    await ctx.send("Пиздабол")
+
 @bot.command() #Остановить все циклы и отключить от voice бота
 async def stop(ctx):
     global looping
@@ -340,7 +345,6 @@ async def starter(ctx):
                         picture = discord.File(f)
                         await ctx.send(file=picture)
                         await dock_detector() #инициализация проверки врагов в доке с условием выхода
-                        break
                 else:
                     current_status = 'Пытаюсь крабить, все тихо'
                     await imageworks.main_processor() #процесс автолока, проверки щитов у цели
@@ -358,28 +362,43 @@ async def dock_detector():
     global looping
     looping = True
     while looping:
+        if not looping:
+            current_status = 'Ожидаю команду'
+            break
         current_status = 'Прячусь в доке, выполняю команду starter'
         #print("инициализация перезапуска")
-        await asyncio.sleep(60)
+        await asyncio.sleep(140)
         capture_screenshot()
         result = await imageworks.check_enemies()
         if result:
-            print("в системе враги, жду 60 секунд")
+            print("в системе враги, жду 140 секунд")
             continue
         else:
+            if not looping:
+                break
             await adb.undock()
-            await asyncio.sleep(20)
+            if not looping:
+                break
+            await asyncio.sleep(25)
+            if not looping:
+                break
             await adb.zoom()
+            if not looping:
+                break
             await asyncio.sleep(1)
             await adb.pilot()
+            if not looping:
+                break
             await asyncio.sleep(1)
             await adb.core()
+            if not looping:
+                break
             await asyncio.sleep(1)
             break
 
 @bot.command()#Инициализация выхода из дока и подготовка к старту
 async def runner(ctx):
-    await ctx.send("Инициализация выхода из дока и подготовка к старту")
+    await ctx.send("Начинаю уебывать из дока и готовиться крабить")
     await adb.undock()
     await asyncio.sleep(16)
     await adb.zoom()
@@ -388,7 +407,7 @@ async def runner(ctx):
     await asyncio.sleep(1)
     await adb.core()
     await asyncio.sleep(1)
-    await ctx.send("Подготовка к старту выполнена, высылаю скриншот для проверки")
+    await ctx.send("Я готов приносить боль и слезы, высылаю скриншот для проверки")
     await screen(ctx)
 
 ############################################################## мониторинг, локалбот

@@ -203,6 +203,11 @@ async def undock():
     print("Выхожу из дока.")
     tap_random(click_coords3)
 
+async def nanocore():
+    skill = (570, 445)
+    print("Жму на скилл ядра.")
+    tap_random(skill)
+
 async def zoom():
     tap_random(click_coords4)
     print("Зумим камеру")
