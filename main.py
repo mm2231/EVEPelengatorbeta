@@ -1,5 +1,5 @@
 import asyncio
-import psutil
+#import psutil
 import os
 import subprocess
 import sys
@@ -185,7 +185,8 @@ async def on_ready():
 @bot.command()
 async def devices(ctx):
     try:
-        result = subprocess.run(["adb", "devices"], capture_output=True, text=True)
+        result = subprocess.run([fr"{adb_path}\adb", "devices"], capture_output=True, text=True)
+        print(result)
         devices_output = result.stdout.strip()
         await ctx.send(f"Список устройств ADB:\n{devices_output}")
     except Exception as e:
@@ -314,11 +315,12 @@ async def undock(ctx):
 async def stop(ctx):
     global looping
     looping = False
-    await ctx.send("Отключаюсь")
+    #await ctx.send("Отключаюсь")
     #await speak(ctx, message="Отключаюсь!")
 
 @bot.command() #Основной бот автоядра
 async def starter(ctx):
+    global current_status
     global looping
     looping = True
     capture_screenshot()
@@ -333,12 +335,14 @@ async def starter(ctx):
                 result = await imageworks.check_enemies()
                 if result:
                     tap_random(click_coords)
-                    await ctx.send("Тревога!")
+                    await ctx.send("Обнаружена угроза!")
                     with open('screenshot.png', 'rb') as f:
                         picture = discord.File(f)
                         await ctx.send(file=picture)
-                        #await dock_detector() #инициализация проверки врагов в доке с условием выхода
+                        await dock_detector() #инициализация проверки врагов в доке с условием выхода
+                        break
                 else:
+                    current_status = 'Пытаюсь крабить, все тихо'
                     await imageworks.main_processor() #процесс автолока, проверки щитов у цели
         except Exception as e:
             print("Произошла ошибка:")
@@ -350,15 +354,17 @@ async def starter(ctx):
 
  #инициализация бесконечного цикла проверки врагов в доке с условием выхода
 async def dock_detector():
+    global current_status
     global looping
     looping = True
     while looping:
-        print("инициализация перезапуска")
+        current_status = 'Прячусь в доке, выполняю команду starter'
+        #print("инициализация перезапуска")
         await asyncio.sleep(60)
         capture_screenshot()
         result = await imageworks.check_enemies()
         if result:
-            print("в системе враги")
+            print("в системе враги, жду 60 секунд")
             continue
         else:
             await adb.undock()
