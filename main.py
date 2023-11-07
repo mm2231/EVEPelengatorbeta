@@ -371,7 +371,7 @@ async def undock(ctx):
     await adb.undock()
     await ctx.send("Андокаюсь")
 
-@bot.command() #нажать на скилл ядра
+@bot.command() #нажать на скилл импланта
 async def roll(ctx):
     await adb.nanocore()
     await ctx.send("Пиздабол")
@@ -615,20 +615,6 @@ async def repairimages(ctx):
 
 ##########################################################################################################TTS Fnc
 
-@bot.command() #text to speach fnc, save the file and send it to discord channel
-async def tts(ctx, text):
-    engine = pyttsx3.init()
-    engine.setProperty('rate', 150)  # Настройка скорости речи (по умолчанию 200)
-    engine.setProperty('volume', 1)  # Настройка громкости речи (от 0 до 1)
-    voices = engine.getProperty('voices')
-    russian_voice_index = 0  # Индекс русского голоса
-    engine.setProperty('voice', voices[russian_voice_index].id)
-    filename = 'voice_message.mp3'
-    engine.save_to_file(text, filename)
-    engine.runAndWait()
-    with open(filename, 'rb') as file:
-        await ctx.send(file=discord.File(file, filename))
-
 @bot.command() #to say something on the Discord channel
 async def speak(ctx, *, message):
     if ctx.author.voice is None:
@@ -656,17 +642,6 @@ async def speak(ctx, *, message):
     voice_client.play(discord.FFmpegPCMAudio(filename))
     while voice_client.is_playing():
         await asyncio.sleep(1)
-
-''''@bot.command()
-async def play(ctx):
-    if not ctx.author.voice:
-        await ctx.send("Вы не находитесь в голосовом канале.")
-        return
-    voice_channel = ctx.author.voice.channel
-    voice_client = ctx.voice_client
-    if not voice_client:
-        voice_client = await voice_channel.connect()
-    voice_client.play(discord.FFmpegPCMAudio('grid.mp3'), after=lambda e: print('done', e))'''
 
 '''
 ############################################################## trade
