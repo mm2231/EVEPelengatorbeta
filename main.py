@@ -5,6 +5,7 @@ import subprocess
 import sys
 import traceback
 import cv2
+import imageio
 import discord
 import keyboard
 import numpy as np
@@ -369,6 +370,8 @@ async def starter(ctx):
                 f.write("Произошла ошибка:\n")
                 f.write(traceback.format_exc())
         await asyncio.sleep(1)
+    if not looping:
+        current_status = 'Ожидаю команду'
 
  #инициализация бесконечного цикла проверки врагов в доке с условием выхода
 async def dock_detector():
@@ -381,11 +384,11 @@ async def dock_detector():
             break
         current_status = 'Прячусь в доке, выполняю команду starter'
         #print("инициализация перезапуска")
-        await asyncio.sleep(140)
+        await asyncio.sleep(300)
         capture_screenshot()
         result = await imageworks.check_enemies()
         if result:
-            print("в системе враги, жду 140 секунд")
+            print("в системе враги, жду 300 секунд")
             continue
         else:
             if not looping:
@@ -473,7 +476,8 @@ async def start(ctx):
             else:
                 current_status = 'Угроз не обнаружено'
                 grid_result = False
-
+    if not looping:
+        current_status = 'Ожидаю команду'
 #Обработка грида овервью
 async def grid(ctx):
     channels = read_channels_from_config()
