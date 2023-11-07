@@ -86,18 +86,22 @@ async def system(ctx):
     await ctx.send(f"Загрузка ЦПУ: {cpu_load}%")
     await ctx.send(f"Использовано оперативной памяти: {memory_usage}%")
     await ctx.send(f"Запущенные эмуляторы: \n{windows_column}")
+
 @bot.command()
 async def restartadb(ctx):
     if looping:
         await ctx.send("Нельзя перезапускать сервер при работе цикла start, отключите мониторинг")
     else:
-        await ctx.send("Инициализирую перезагрузку сервера ADB. Ожидайте!")
-        subprocess.run([adb_path, 'kill-server'])
-        await asyncio.sleep(1)
-        subprocess.run([adb_path, 'start-server'])
-        await asyncio.sleep(20)
-        await ctx.send("Сервер adb успешно перезапущен.")
-        await devices(ctx)
+        try:
+            await ctx.send("Инициализирую перезагрузку сервера ADB. Ожидайте!")
+            subprocess.run([adb_path, 'kill-server'])
+            await asyncio.sleep(1)
+            subprocess.run([adb_path, 'start-server'])
+            await asyncio.sleep(20)
+            await ctx.send("Сервер adb успешно перезапущен.")
+            await devices(ctx)
+        except Exception as e:
+            await ctx.send(f"Ошибка при перезагрузке ADB: {e}")
 
 @bot.command()
 async def matrix(ctx):
@@ -184,13 +188,23 @@ async def on_ready():
 
 @bot.command()
 async def devices(ctx):
+    devices = get_adb_devices()
+    if devices is not None:
+        await ctx.send('\n'.join(devices))
+
+def get_adb_devices():
     try:
-        result = subprocess.run([fr"{adb_path}\adb", "devices"], capture_output=True, text=True)
-        print(result)
-        devices_output = result.stdout.strip()
-        await ctx.send(f"Список устройств ADB:\n{devices_output}")
+        devices = []
+        output = subprocess.check_output(['adb', 'devices']).decode('utf-8').strip().split('\n')
+        for line in output[1:]:
+            if '\tdevice' in line:
+                device = line.split('\t')[0]
+                devices.append(device)
+        return devices
+    except subprocess.CalledProcessError as e:
+        print(f'Ошибка при выполнении команды: {e}')
     except Exception as e:
-        await ctx.send(f"Ошибка при получении списка устройств ADB: {e}")
+        print(f'Ошибка: {e}')
 
 def get_system_stats():
     cpu_load = psutil.cpu_percent(interval=1)

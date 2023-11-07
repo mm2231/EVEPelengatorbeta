@@ -93,7 +93,7 @@ def check_device_connection(device_id):
 def check_app_running(device_id):
     result = subprocess.run([adb_path, '-s', device_id, 'shell', 'dumpsys', 'window', 'windows'], capture_output=True, text=True)
     output = result.stdout.strip()
-    if "com.netease.eve.en" in output:  # замените "YourAppName" на имя вашего приложения
+    if "com.netease.eve.en" in output:
         return True
     return False
 
