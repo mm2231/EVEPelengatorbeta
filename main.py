@@ -1,11 +1,11 @@
 import asyncio
+import shutil
 import psutil
 import os
 import subprocess
 import sys
 import traceback
 import cv2
-import imageio
 import discord
 import keyboard
 import numpy as np
@@ -81,6 +81,51 @@ else:
     print("Connected to the emulator...")'''
 
 #system functions
+
+@bot.command()
+async def getconfig(ctx):
+    if not os.path.exists("config.txt"):
+        await ctx.send("Файл конфигурации не найден.")
+
+    await ctx.send(file=discord.File("config.txt"))
+
+async def update_config_file(uploaded_file):
+    # Проверка наличия файла config.txt
+    if not os.path.exists("config.txt"):
+        return "Файл config.txt не найден."
+
+    # Сохранение загруженного файла
+    temp_file_path = "temp_config.txt"
+    with open(temp_file_path, "wb") as file:
+        file.write(await uploaded_file.read())
+
+    # Замена файла config.txt
+    shutil.copy(temp_file_path, "config.txt")
+
+    # Удаление временного файла
+    os.remove(temp_file_path)
+
+    return "Конфигурация обновлена."
+
+@bot.command()
+async def updateconfig(ctx):
+    # Проверка наличия вложения
+    if len(ctx.message.attachments) == 0:
+        await ctx.send("Вы должны прикрепить файл для обновления config.txt.")
+        return
+
+    # Получение первого вложенного файла
+    attachment = ctx.message.attachments[0]
+
+    # Проверка расширения файла
+    if not attachment.filename.endswith(".txt"):
+        await ctx.send("Неверный формат файла. Поддерживаются только текстовые файлы.")
+        return
+
+    # Вызов функции обновления файла
+    response = await update_config_file(attachment)
+    await ctx.send(response)
+
 @bot.command()
 async def system(ctx):
     cpu_load, memory_usage, windows_column = get_system_stats()
@@ -326,7 +371,7 @@ async def undock(ctx):
     await adb.undock()
     await ctx.send("Андокаюсь")
 
-@bot.command()
+@bot.command() #нажать на скилл ядра
 async def roll(ctx):
     await adb.nanocore()
     await ctx.send("Пиздабол")
@@ -434,7 +479,7 @@ def capture_screenshot():
     subprocess.run([adb_path, '-s', device_id, 'pull', '/sdcard/screenshot.png', './screenshot.png'],
                    stdout=subprocess.DEVNULL)
 
-@bot.command()
+@bot.command() #Запуск мониторинга локалбота
 async def start(ctx):
     channels = read_channels_from_config()
     global current_status
@@ -478,6 +523,7 @@ async def start(ctx):
                 grid_result = False
     if not looping:
         current_status = 'Ожидаю команду'
+
 #Обработка грида овервью
 async def grid(ctx):
     channels = read_channels_from_config()
