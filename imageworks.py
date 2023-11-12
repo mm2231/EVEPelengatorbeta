@@ -170,7 +170,7 @@ async def check_enemies(): #Проверка наличия врагов в си
     nonzero_count = np.count_nonzero(diff)
     #print(nonzero_count)
     if nonzero_count >= 175:
-        print(f"Различие пикселей: {nonzero_count}")
+        #print(f"Различие пикселей: {nonzero_count}")
         return True
     else:
         #print("Угроз не обнаружено")
