@@ -486,78 +486,98 @@ async def start(ctx):
     global looping
     looping = True
     while looping:
-        connected = adb.check_device_connection(device_id)
-        app_running = adb.check_app_running(device_id)
-        if not connected:
-            await ctx.send('Ошибка подключения к эмулятору')
-            break
-        elif not app_running:
-            await ctx.send('Ошибка подключения к игровому клиенту')
-            break
-        else:
-            capture_screenshot()
-            await asyncio.sleep(1)
-            image = cv2.imread('screenshot.png')
-            img1 = image[crop_coordss[0][0]:crop_coordss[0][1], crop_coordss[0][2]:crop_coordss[0][3]]
-            img2 = image[crop_coordss[1][0]:crop_coordss[1][1], crop_coordss[1][2]:crop_coordss[1][3]]
-            img3 = image[crop_coordss[2][0]:crop_coordss[2][1], crop_coordss[2][2]:crop_coordss[2][3]]
-            imgh = cv2.hconcat([img2, img1])
-            dsize = (618, 423)
-            imgh = cv2.resize(imgh, dsize)
-            result = cv2.vconcat([img3, imgh])
-            cv2.imwrite(local_file, result)
-            imageworks.add_watermark(local_file)
-            result = await imageworks.check_enemies()
-            if result:
-                current_status = 'Угроза безопасности'
-                await asyncio.sleep(0.5)
-                grid_result = await grid(ctx)
-                if grid_result:
-                    for channel_id in channels:
-                        channel = bot.get_channel(int(channel_id))
-                        if channel:
-                            await channel.send(file=discord.File(local_file))
-                    break
+        try:
+            connected = adb.check_device_connection(device_id)
+            app_running = adb.check_app_running(device_id)
+            if not connected:
+                await ctx.send('Ошибка подключения к эмулятору')
+                break
+            elif not app_running:
+                await ctx.send('Ошибка подключения к игровому клиенту')
+                break
             else:
-                current_status = 'Угроз не обнаружено'
-                grid_result = False
-    if not looping:
-        current_status = 'Ожидаю команду'
+                capture_screenshot()
+                await asyncio.sleep(1)
+                image = cv2.imread('screenshot.png')
+                img1 = image[crop_coordss[0][0]:crop_coordss[0][1], crop_coordss[0][2]:crop_coordss[0][3]]
+                img2 = image[crop_coordss[1][0]:crop_coordss[1][1], crop_coordss[1][2]:crop_coordss[1][3]]
+                img3 = image[crop_coordss[2][0]:crop_coordss[2][1], crop_coordss[2][2]:crop_coordss[2][3]]
+                imgh = cv2.hconcat([img2, img1])
+                dsize = (618, 423)
+                imgh = cv2.resize(imgh, dsize)
+                result = cv2.vconcat([img3, imgh])
+                cv2.imwrite(local_file, result)
+                imageworks.add_watermark(local_file)
+                result = await imageworks.check_enemies()
+                if result:
+                    current_status = 'Угроза безопасности'
+                    await asyncio.sleep(0.5)
+                    grid_result = await grid(ctx)
+                    if grid_result:
+                        for channel_id in channels:
+                            channel = bot.get_channel(int(channel_id))
+                            if channel:
+                                try:
+                                    await channel.send(file=discord.File(local_file))
+                                except Exception as e:
+                                    print(f"Ошибка при отправке изображения в канал Discord: {e}")
+                        break
+                else:
+                    current_status = 'Угроз не обнаружено'
+                    grid_result = False
+        except Exception as e:
+            print(f"Ошибка при обработке изображения: {e}")
+        finally:
+            if not looping:
+                current_status = 'Ожидаю команду'
 
 #Обработка грида овервью
 async def grid(ctx):
-    channels = read_channels_from_config()
-    img = cv2.imread('local.png')
-    img_cropped1 = img[crop_dy1:crop_dy2, crop_dx1:crop_dx2]
-    cv2.imwrite('grid.png', img_cropped1)
-    img_cropped2 = img[crop_cy1:crop_cy2, crop_cx1:crop_cx2]
-    cv2.imwrite('name.png', img_cropped2)
-    img2 = cv2.imread('grid.png')
-    img3 = cv2.imread('name.png')
-    if img2 is not None and img3 is not None:
-        text = pytesseract.image_to_string(img2, config='--tessdata-dir "C:\\Program Files\\Tesseract-OCR\\tessdata"', output_type='string')
-        if text:
-            print("Обнаружен террорист: ", text)
-            cv2.imwrite('ocrresult.png', img2)
-            for channel_id in channels:
-                channel = bot.get_channel(int(channel_id))
-                if channel:
-                    await channel.send(file=discord.File(local_file))
-                    await channel.send(f'{text}')
+    try:
+        channels = read_channels_from_config()
+        img = cv2.imread('local.png')
+        if img is None:
+            print("Ошибка при чтении изображения")
+            return
+
+        if any(var is None for var in [crop_dy1, crop_dy2, crop_dx1, crop_dx2]):
+            print("Ошибка: одна или несколько переменных crop_* не определена")
+            return
+        img_cropped1 = img[crop_dy1:crop_dy2, crop_dx1:crop_dx2]
+        cv2.imwrite('grid.png', img_cropped1)
+        img_cropped2 = img[crop_cy1:crop_cy2, crop_cx1:crop_cx2]
+        cv2.imwrite('name.png', img_cropped2)
+        img2 = cv2.imread('grid.png')
+        img3 = cv2.imread('name.png')
+        if img2 is not None and img3 is not None:
+            text = pytesseract.image_to_string(img2, config='--tessdata-dir "C:\\Program Files\\Tesseract-OCR\\tessdata"', output_type='string')
+            if text:
+                print("Обнаружен террорист: ", text)
+                cv2.imwrite('ocrresult.png', img2)
+                for channel_id in channels:
+                    channel = bot.get_channel(int(channel_id))
+                    if channel:
+                        try:
+                            await channel.send(file=discord.File(local_file))
+                            await channel.send(f'{text}')
+                        except Exception as e:
+                            print(f"Ошибка при отправке изображения в канал Discord: {e}")
+                await asyncio.sleep(0.5)
+                voice_channel_id = get_voice_channel_id()
+                if voice_channel_id:
+                    voice_channel = bot.get_channel(voice_channel_id)
+                    vc = ctx.voice_client
+                    if not vc:
+                        vc = await voice_channel.connect()
+                    elif vc.channel != voice_channel:
+                        await vc.move_to(voice_channel)
+                    vc.play(discord.FFmpegPCMAudio('grid.mp3'))
+                    while vc.is_playing():
+                        await asyncio.sleep(1)
+                    vc.stop()
             await asyncio.sleep(0.5)
-            voice_channel_id = get_voice_channel_id()
-            if voice_channel_id:
-                voice_channel = bot.get_channel(voice_channel_id)
-                vc = ctx.voice_client
-                if not vc:
-                    vc = await voice_channel.connect()
-                elif vc.channel != voice_channel:
-                    await vc.move_to(voice_channel)
-                vc.play(discord.FFmpegPCMAudio('grid.mp3'))
-                while vc.is_playing():
-                    await asyncio.sleep(1)
-                vc.stop()
-        await asyncio.sleep(0.5)
+    except Exception as e:
+        print(f"Ошибка при обработке изображения в функции grid(): {e}")
 
 @bot.command() #Текущий статус бота по глобальным флагам
 async def status(ctx):
@@ -642,6 +662,16 @@ async def speak(ctx, *, message):
     voice_client.play(discord.FFmpegPCMAudio(filename))
     while voice_client.is_playing():
         await asyncio.sleep(1)
+
+##################################################################################### Autocrab
+async def crab(ctx):
+    global current_status
+    global looping
+    looping = True
+    capture_screenshot()
+    while looping:
+        await asyncio.sleep(0.1)
+
 
 '''
 ############################################################## trade

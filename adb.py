@@ -2,9 +2,9 @@ import subprocess
 import asyncio
 import random
 import cv2
-import adb
 import discord
 from discord.ext import commands
+
 intents = discord.Intents.all()
 bot = commands.Bot(command_prefix='!', intents=intents)
 
@@ -252,10 +252,3 @@ async def dock():
     print("Докаюсь")
     tap_random(click_coords)
 
-async def tap(ctx, square_number):
-    square_number = int(square_number)
-    if f'coord_{square_number}' in globals():
-        click_on_coordinate(square_number)
-        await ctx.send('click clack')
-    else:
-        await ctx.send('Wrong square number')
