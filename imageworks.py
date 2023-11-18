@@ -9,6 +9,8 @@ import pytesseract
 import cv2
 import numpy as np
 import random
+
+import adb
 from adb import capture_screenshot #convert_coordinates
 from adb import lock
 from adb import tap_random
@@ -18,6 +20,7 @@ previous_file = '1.png'
 current_file = '2.png'
 crop_coords2 = (585, 329, 614, 357) #masslock
 crop_coords = (1, 415, 185, 450) #local emulator
+first_module = (650, 497)
 
 def crop_image(image_path, crop_coords):
     img = cv2.imread(image_path)
@@ -259,6 +262,10 @@ async def findwarp(): #найти варп
     keywords = "Warp,arp,war,WARP,War"
     await find(keywords)
 
+async def findsmall(): #найти маленькую
+    keywords = "Small,small,SmaII,smaII,mall"
+    await find(keywords)
+
 async def check_enemy_shield():
     first_module = (650, 497)
     image_path = "screenshot.png"
@@ -271,7 +278,7 @@ async def check_enemy_shield():
     b_max = 185  # Максимальное значение B
     # print("Значения RGB пикселя:", r, g, b)
     if r > r_min and g < g_max and b < b_max:
-        await tap_random(first_module)
+        tap_random(first_module)
 
 async def main_processor():
     image_path = "screenshot.png"
@@ -286,7 +293,16 @@ async def main_processor():
     if r > r_min and g < g_max and b < b_max:
         # print("Лочим непись")
         await processlock()
-        await check_enemy_shield()
+        '''await check_enemy_shield()
+    else:
+        await adb.openover()
+        await asyncio.sleep(0.1)
+        await findsmall()
+        await asyncio.sleep(0.5)
+        await findwarp()
+        await asyncio.sleep(1)
+        await adb.closeover()
+        await asyncio.sleep(15)'''
 
 def add_watermark(image_path):
     img = PIL.Image.open(image_path)
@@ -295,3 +311,22 @@ def add_watermark(image_path):
     time_str = datetime.now().strftime("%d-%m-%y %H:%M:%S")
     draw.text((50, 50), time_str, font=font, fill=(255, 255, 255, 128))
     img.save(image_path)
+
+def add_grid_to_screenshot(screenshot_file, grid_size):
+    screenshot = cv2.imread(screenshot_file)
+    height, width, _ = screenshot.shape
+    square_width = width // grid_size[0]
+    square_height = height // grid_size[1]
+    for i in range(grid_size[0]):
+        for j in range(grid_size[1]):
+            x1 = i * square_width
+            y1 = j * square_height
+            x2 = (i + 1) * square_width
+            y2 = (j + 1) * square_height
+            center_x = (x1 + x2) // 2
+            center_y = (y1 + y2) // 2
+            cv2.putText(screenshot, f'{i * grid_size[1] + j}', (center_x - 10, center_y + 10),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.3, (0, 0, 255), 1)
+            globals()[f'coord_{i * grid_size[1] + j}'] = (center_x, center_y)
+            cv2.rectangle(screenshot, (x1, y1), (x2, y2), (0, 255, 0), 1)
+    cv2.imwrite('coords.png', screenshot)

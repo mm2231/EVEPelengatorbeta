@@ -152,33 +152,14 @@ async def restartadb(ctx):
 @bot.command()
 async def matrix(ctx):
     capture_screenshot()
-    add_grid_to_screenshot('screenshot.png', (25, 15))
+    imageworks.add_grid_to_screenshot('screenshot.png', (25, 15))
     with open('coords.png', 'rb') as f:
         image = discord.File(f, filename='coords.png')
         await ctx.send(file=image)
 
-def add_grid_to_screenshot(screenshot_file, grid_size):
-    screenshot = cv2.imread(screenshot_file)
-    height, width, _ = screenshot.shape
-    square_width = width // grid_size[0]
-    square_height = height // grid_size[1]
-    for i in range(grid_size[0]):
-        for j in range(grid_size[1]):
-            x1 = i * square_width
-            y1 = j * square_height
-            x2 = (i + 1) * square_width
-            y2 = (j + 1) * square_height
-            center_x = (x1 + x2) // 2
-            center_y = (y1 + y2) // 2
-            cv2.putText(screenshot, f'{i * grid_size[1] + j}', (center_x - 10, center_y + 10),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.3, (0, 0, 255), 1)
-            globals()[f'coord_{i * grid_size[1] + j}'] = (center_x, center_y)
-            cv2.rectangle(screenshot, (x1, y1), (x2, y2), (0, 255, 0), 1)
-    cv2.imwrite('coords.png', screenshot)
-
-def click_on_coordinate(coord_number):
+'''def click_on_coordinate(coord_number):
     center_x, center_y = globals()[f'coord_{coord_number}']
-    tap_random((center_x, center_y))
+    tap_random((center_x, center_y))'''
 
 @bot.command()
 async def tap(ctx, square_number):
@@ -664,13 +645,47 @@ async def speak(ctx, *, message):
         await asyncio.sleep(1)
 
 ##################################################################################### Autocrab
+@bot.command()
 async def crab(ctx):
     global current_status
     global looping
     looping = True
     capture_screenshot()
     while looping:
-        await asyncio.sleep(0.1)
+        result = await imageworks.check_enemies()
+        if result:
+            tap_random(click_coords)
+            await ctx.send("Обнаружена угроза!")
+            with open('screenshot.png', 'rb') as f:
+                picture = discord.File(f)
+                await ctx.send(file=picture)
+                await lowsecrunner()
+        await asyncio.sleep(0.5)
+        await imageworks.main_processor()
+        await asyncio.sleep(0.5)
+
+async def lowsecrunner():
+    global current_status
+    global looping
+    looping = True
+    while looping:
+        if not looping:
+            current_status = 'Ожидаю команду'
+            break
+        current_status = 'Жду ухода врагов из системы'
+        #print("инициализация перезапуска")
+        await asyncio.sleep(60)
+        capture_screenshot()
+        result = await imageworks.check_enemies()
+        if result:
+            print("в системе враги, жду 60 секунд")
+            continue
+        else:
+            await adb.pilot()
+            if not looping:
+                break
+            await asyncio.sleep(1)
+            break
 
 
 '''

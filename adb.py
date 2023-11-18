@@ -252,3 +252,5 @@ async def dock():
     print("Докаюсь")
     tap_random(click_coords)
 
+
+
