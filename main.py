@@ -645,24 +645,44 @@ async def speak(ctx, *, message):
         await asyncio.sleep(1)
 
 ##################################################################################### Autocrab
-@bot.command()
-async def crab(ctx):
+
+@bot.command() #Основной lowsec
+async def craber(ctx):
     global current_status
     global looping
     looping = True
     capture_screenshot()
+    cv2.imwrite(previous_file, imageworks.process_image('screenshot.png'))
     while looping:
-        result = await imageworks.check_enemies()
-        if result:
-            tap_random(click_coords)
-            await ctx.send("Обнаружена угроза!")
-            with open('screenshot.png', 'rb') as f:
-                picture = discord.File(f)
-                await ctx.send(file=picture)
-                await lowsecrunner()
-        await asyncio.sleep(0.5)
-        await imageworks.main_processor()
-        await asyncio.sleep(0.5)
+        await asyncio.sleep(0.1)
+        #await ctx.send("Поехали")
+        try:
+            while looping:
+                await asyncio.sleep(0.5)
+                capture_screenshot()
+                result = await imageworks.check_enemies()
+                if result:
+                    tap_random(click_coords)
+                    await ctx.send("Обнаружена угроза!")
+                    with open('screenshot.png', 'rb') as f:
+                        picture = discord.File(f)
+                        await ctx.send(file=picture)
+                        await lowsecrunner() #инициализация проверки врагов
+                else:
+                    current_status = 'Пытаюсь крабить, все тихо'
+                    await asyncio.sleep(4)
+                    await imageworks.main_processor() #процесс автолока, проверки щитов у цели
+                    await asyncio.sleep(1)
+                    await imageworks.main_processor()
+        except Exception as e:
+            print("Произошла ошибка:")
+            traceback.print_exc()
+            with open("error_log.txt", "a") as f:
+                f.write("Произошла ошибка:\n")
+                f.write(traceback.format_exc())
+        await asyncio.sleep(1)
+    if not looping:
+        current_status = 'Ожидаю команду'
 
 async def lowsecrunner():
     global current_status

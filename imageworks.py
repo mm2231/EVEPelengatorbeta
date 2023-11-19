@@ -263,7 +263,7 @@ async def findwarp(): #найти варп
     await find(keywords)
 
 async def findsmall(): #найти маленькую
-    keywords = "Small,small,SmaII,smaII,mall"
+    keywords = "Small,small,SmaII,smaII,mall,Medium,medium,Large,large"
     await find(keywords)
 
 async def check_enemy_shield():
@@ -278,7 +278,10 @@ async def check_enemy_shield():
     b_max = 185  # Максимальное значение B
     # print("Значения RGB пикселя:", r, g, b)
     if r > r_min and g < g_max and b < b_max:
-        tap_random(first_module)
+        #tap_random(first_module)
+        return True
+    else:
+        return False
 
 async def main_processor():
     image_path = "screenshot.png"
@@ -293,16 +296,16 @@ async def main_processor():
     if r > r_min and g < g_max and b < b_max:
         # print("Лочим непись")
         await processlock()
-        '''await check_enemy_shield()
+        await asyncio.sleep(0.5)
     else:
         await adb.openover()
-        await asyncio.sleep(0.1)
+        await asyncio.sleep(1)
         await findsmall()
-        await asyncio.sleep(0.5)
+        await asyncio.sleep(1)
         await findwarp()
         await asyncio.sleep(1)
         await adb.closeover()
-        await asyncio.sleep(15)'''
+        await asyncio.sleep(22)
 
 def add_watermark(image_path):
     img = PIL.Image.open(image_path)
