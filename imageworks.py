@@ -233,7 +233,7 @@ async def check_swipe(): #Проверка на необходимость св�
     else:
         return False
 
-async def check_cargo(): #роверка на полное карго
+async def check_cargo(): #проверка на полное карго
     image_path = "screenshot.png"
     img = cv2.imread(image_path)
     x = 21  # Координата x

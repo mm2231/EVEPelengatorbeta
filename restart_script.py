@@ -1,6 +1,9 @@
-import subprocess
+import os
+import sys
 
-def run_bat_file():
-    subprocess.call(["newbot1.bat"], shell=True)
+def restart_script():
+    python = sys.executable
+    os.execl(python, python, *sys.argv)
 
-run_bat_file()
+if __name__ == "__main__":
+    restart_script()
