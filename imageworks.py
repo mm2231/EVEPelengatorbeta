@@ -296,7 +296,7 @@ async def main_processor():
     if r > r_min and g < g_max and b < b_max:
         # print("Лочим непись")
         await processlock()
-        await asyncio.sleep(0.5)
+        await asyncio.sleep(2)
     else:
         await adb.openover()
         await asyncio.sleep(1)
@@ -305,7 +305,7 @@ async def main_processor():
         await findwarp()
         await asyncio.sleep(1)
         await adb.closeover()
-        await asyncio.sleep(22)
+        await asyncio.sleep(25)
 
 def add_watermark(image_path):
     img = PIL.Image.open(image_path)

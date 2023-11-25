@@ -410,11 +410,11 @@ async def dock_detector():
             break
         current_status = 'Прячусь в доке, выполняю команду starter'
         #print("инициализация перезапуска")
-        await asyncio.sleep(300)
+        await asyncio.sleep(120)
         capture_screenshot()
         result = await imageworks.check_enemies()
         if result:
-            print("в системе враги, жду 300 секунд")
+            print("в системе враги, жду 120 секунд")
             continue
         else:
             if not looping:
@@ -667,13 +667,12 @@ async def craber(ctx):
                     with open('screenshot.png', 'rb') as f:
                         picture = discord.File(f)
                         await ctx.send(file=picture)
-                        await lowsecrunner() #инициализация проверки врагов
+                        #await lowsecrunner() #инициализация проверки врагов
+                        await dock_detector()
                 else:
                     current_status = 'Пытаюсь крабить, все тихо'
-                    await asyncio.sleep(4)
+                    await asyncio.sleep(3)
                     await imageworks.main_processor() #процесс автолока, проверки щитов у цели
-                    await asyncio.sleep(1)
-                    await imageworks.main_processor()
         except Exception as e:
             print("Произошла ошибка:")
             traceback.print_exc()
