@@ -79,6 +79,7 @@ async def find(keywords: str):
         print(click)
     else:
         print("не нашел")
+        return False
     cv2.imwrite("tess.png", inverted_img)
 
 async def check_assist(): #проверка на наличие пикселя щита у первой залоченной неписи
@@ -261,11 +262,20 @@ async def findasteroid(): #найти астероид
 
 async def findwarp(): #найти варп
     keywords = "Warp,arp,war,WARP,War"
-    await find(keywords)
+    result = await find(keywords)
+    if result:
+        return True
+    else:
+        return False
 
 async def findsmall(): #найти маленькую
     keywords = "Small,small,SmaII,smaII,mall,Medium,medium,Large,large"
-    await find(keywords)
+    result = await find(keywords)
+    if result:
+        return True
+    else:
+        return False
+
 
 async def check_enemy_shield():
     first_module = (650, 497)
@@ -303,9 +313,19 @@ async def main_processor():
         await asyncio.sleep(1)
         tap_random(click_coords2)
         await asyncio.sleep(1)
-        await findsmall()
+        while True:
+            result = await findsmall()
+            if result:
+                break
+            else:
+                continue
         await asyncio.sleep(1)
-        await findwarp()
+        while True:
+            result = await findwarp()
+            if result:
+                break
+            else:
+                continue
         await asyncio.sleep(1)
         await adb.closeover()
         await asyncio.sleep(1)

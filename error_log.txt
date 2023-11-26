@@ -73,3 +73,27 @@ Traceback (most recent call last):
     img_cropped = img[crop_coords[1]:crop_coords[3], crop_coords[0]:crop_coords[2]]
                   ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 TypeError: 'NoneType' object is not subscriptable
+Произошла ошибка:
+Traceback (most recent call last):
+  File "C:\Users\Женя\PycharmProjects\EVEPelengatorbeta\main.py", line 675, in craber
+    await imageworks.main_processor() #процесс автолока, проверки щитов у цели
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Женя\PycharmProjects\EVEPelengatorbeta\imageworks.py", line 308, in main_processor
+    result = await findsmall()
+             ^^^^^^^^^^^^^^^^^
+  File "C:\Users\Женя\PycharmProjects\EVEPelengatorbeta\imageworks.py", line 269, in findsmall
+    await find(keywords)
+  File "C:\Users\Женя\PycharmProjects\EVEPelengatorbeta\imageworks.py", line 61, in find
+    text_data = pytesseract.image_to_data(inverted_img, output_type='dict')
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Женя\PycharmProjects\BotplusTest\venv\Lib\site-packages\pytesseract\pytesseract.py", line 527, in image_to_data
+    return {
+           ^
+  File "C:\Users\Женя\PycharmProjects\BotplusTest\venv\Lib\site-packages\pytesseract\pytesseract.py", line 533, in <lambda>
+    Output.DICT: lambda: file_to_dict(run_and_get_output(*args), '\t', -1),
+                                      ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Женя\PycharmProjects\BotplusTest\venv\Lib\site-packages\pytesseract\pytesseract.py", line 288, in run_and_get_output
+    run_tesseract(**kwargs)
+  File "C:\Users\Женя\PycharmProjects\BotplusTest\venv\Lib\site-packages\pytesseract\pytesseract.py", line 264, in run_tesseract
+    raise TesseractError(proc.returncode, get_errors(error_string))
+pytesseract.pytesseract.TesseractError: (3221225786, 'ObjectCache(00007ffc248185a0)::~ObjectCache(): WARNING! LEAK! object 0000022c95273a60 still has count 1 (id C:\\Program Files\\Tesseract-OCR/tessdata/eng.traineddatalstm-punc-dawg) ObjectCache(00007ffc248185a0)::~ObjectCache(): WARNING! LEAK! object 0000022c931f8200 still has count 1 (id C:\\Program Files\\Tesseract-OCR/tessdata/eng.traineddatalstm-word-dawg) ObjectCache(00007ffc248185a0)::~ObjectCache(): WARNING! LEAK! object 0000022c95273ad0 still has count 1 (id C:\\Program Files\\Tesseract-OCR/tessdata/eng.traineddatalstm-number-dawg)')
