@@ -21,6 +21,7 @@ current_file = '2.png'
 crop_coords2 = (585, 329, 614, 357) #masslock
 crop_coords = (1, 415, 185, 450) #local emulator
 first_module = (650, 497)
+click_coords2 = (600, 343) # masslock
 
 def crop_image(image_path, crop_coords):
     img = cv2.imread(image_path)
@@ -77,7 +78,7 @@ async def find(keywords: str):
         print(matching_words)
         print(click)
     else:
-        print("не найдены")
+        print("не нашел")
     cv2.imwrite("tess.png", inverted_img)
 
 async def check_assist(): #проверка на наличие пикселя щита у первой залоченной неписи
@@ -300,12 +301,35 @@ async def main_processor():
     else:
         await adb.openover()
         await asyncio.sleep(1)
+        tap_random(click_coords2)
+        await asyncio.sleep(1)
         await findsmall()
         await asyncio.sleep(1)
         await findwarp()
         await asyncio.sleep(1)
         await adb.closeover()
-        await asyncio.sleep(25)
+        await asyncio.sleep(1)
+        await check_red_npc()
+
+async def check_red_npc():
+    while True:
+        capture_screenshot()
+        await asyncio.sleep(1)
+        image_path = "screenshot.png"
+        img = cv2.imread(image_path)
+        x = 926  # Координата x
+        y = 214  # Координата y
+        b, g, r = img[y, x]  # Получаем значения синего, зеленого и красного цветов пикселя
+        r_min = 200  # Минимальное значение R
+        g_max = 60  # Максимальное значение G
+        b_max = 85  # Максимальное значение B
+        # print("Значения RGB пикселя:", r, g, b)
+        if r > r_min and g < g_max and b < b_max:
+            break
+        else:
+            await asyncio.sleep(1)
+            continue
+
 
 def add_watermark(image_path):
     img = PIL.Image.open(image_path)

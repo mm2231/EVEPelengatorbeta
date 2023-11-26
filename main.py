@@ -410,11 +410,11 @@ async def dock_detector():
             break
         current_status = 'Прячусь в доке, выполняю команду starter'
         #print("инициализация перезапуска")
-        await asyncio.sleep(120)
+        await asyncio.sleep(150)
         capture_screenshot()
         result = await imageworks.check_enemies()
         if result:
-            print("в системе враги, жду 120 секунд")
+            print("в системе враги, жду 150 секунд")
             continue
         else:
             if not looping:

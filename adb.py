@@ -234,13 +234,11 @@ async def closeover():
     tap_random(click_coords16)
     delay = random.uniform(1.5, 2)
     await asyncio.sleep(delay)
-    print("Закрываю овервью")
 
 async def openover():
     tap_random(click_coords14)
     delay = random.uniform(1, 2)
     await asyncio.sleep(delay)
-    print("Открываю овервью")
 
 async def login():
     print("Логинюсь")
