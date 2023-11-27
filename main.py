@@ -157,9 +157,9 @@ async def matrix(ctx):
         image = discord.File(f, filename='coords.png')
         await ctx.send(file=image)
 
-'''def click_on_coordinate(coord_number):
+def click_on_coordinate(coord_number):
     center_x, center_y = globals()[f'coord_{coord_number}']
-    tap_random((center_x, center_y))'''
+    tap_random((center_x, center_y))
 
 @bot.command()
 async def tap(ctx, square_number):
