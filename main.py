@@ -1,6 +1,7 @@
 import asyncio
 import shutil
 import psutil
+import time
 import os
 import subprocess
 import sys
@@ -31,6 +32,8 @@ config_file = 'config.txt'
 current_status = 'Ожидание команды'
 looping = False
 mining = False
+dock = False
+space = False
 voice_client = None
 voicechannel = None
 device_id = None
@@ -310,7 +313,6 @@ async def play(ctx):
 @bot.command()
 async def zoom(ctx):
     await adb.zoom()
-    await ctx.send("Зум камеры")
 
 @bot.command()
 async def core(ctx):
@@ -320,12 +322,10 @@ async def core(ctx):
 @bot.command()
 async def openlocal(ctx):
     await adb.openlocal()
-    await ctx.send("Нажимаю на локал")
 
 @bot.command()
 async def openover(ctx):
     await adb.openover()
-    await ctx.send("Открываю овервью")
 
 @bot.command()
 async def closeover(ctx):
@@ -408,50 +408,27 @@ async def dock_detector():
         if not looping:
             current_status = 'Ожидаю команду'
             break
-        current_status = 'Прячусь в доке, выполняю команду starter'
+        current_status = 'Прячусь в доке'
         #print("инициализация перезапуска")
-        await asyncio.sleep(150)
+        await asyncio.sleep(20)
         capture_screenshot()
         result = await imageworks.check_enemies()
         if result:
-            print("в системе враги, жду 150 секунд")
-            continue
+            print("в системе враги, жду 20 секунд")
         else:
-            if not looping:
-                break
-            await adb.undock()
-            if not looping:
-                break
-            await asyncio.sleep(25)
-            if not looping:
-                break
-            await adb.zoom()
-            if not looping:
-                break
-            await asyncio.sleep(1)
-            await adb.pilot()
-            if not looping:
-                break
-            await asyncio.sleep(1)
-            await adb.core()
-            if not looping:
-                break
-            await asyncio.sleep(1)
+            await runner()
             break
 
-@bot.command()#Инициализация выхода из дока и подготовка к старту
+@bot.command() #Инициализация выхода из дока и подготовка к старту
 async def runner(ctx):
-    await ctx.send("Начинаю уебывать из дока и готовиться крабить")
     await adb.undock()
     await asyncio.sleep(16)
-    await adb.zoom()
-    await asyncio.sleep(1)
-    await adb.pilot()
+    result = await imageworks.check_autopilot()
+    if result:
+        await adb.pilot()
     await asyncio.sleep(1)
     await adb.core()
     await asyncio.sleep(1)
-    await ctx.send("Я готов приносить боль и слезы, высылаю скриншот для проверки")
-    await screen(ctx)
 
 ############################################################## мониторинг, локалбот
 
@@ -646,42 +623,113 @@ async def speak(ctx, *, message):
 
 ##################################################################################### Autocrab
 
-@bot.command() #Основной lowsec
+@bot.command()
 async def craber(ctx):
     global current_status
     global looping
     looping = True
     capture_screenshot()
     cv2.imwrite(previous_file, imageworks.process_image('screenshot.png'))
-    while looping:
-        await asyncio.sleep(0.1)
-        #await ctx.send("Поехали")
-        try:
-            while looping:
-                await asyncio.sleep(0.5)
-                capture_screenshot()
-                result = await imageworks.check_enemies()
-                if result:
-                    tap_random(click_coords)
-                    await ctx.send("Обнаружена угроза!")
-                    with open('screenshot.png', 'rb') as f:
-                        picture = discord.File(f)
-                        await ctx.send(file=picture)
-                        #await lowsecrunner() #инициализация проверки врагов
-                        await dock_detector()
-                else:
-                    current_status = 'Пытаюсь крабить, все тихо'
-                    await asyncio.sleep(3)
-                    await imageworks.main_processor() #процесс автолока, проверки щитов у цели
-        except Exception as e:
-            print("Произошла ошибка:")
-            traceback.print_exc()
-            with open("error_log.txt", "a") as f:
-                f.write("Произошла ошибка:\n")
-                f.write(traceback.format_exc())
-        await asyncio.sleep(1)
     if not looping:
         current_status = 'Ожидаю команду'
+    while looping:
+        capture_screenshot()
+        location = imageworks.determine_location("screenshot.png")
+        if location == "pos" or location == "dock":
+            result = await imageworks.check_enemies()
+            if result:
+                await ctx.send("Обнаружена угроза!")
+                with open('screenshot.png', 'rb') as f:
+                    picture = discord.File(f)
+                    await ctx.send(file=picture)
+                current_status = 'В системе враги, ожидаю 60 секунд'
+                print("В системе враги, ожидаю 90 секунд")
+                await asyncio.sleep(90)
+            else:
+                await runner(ctx)
+                current_status = 'Клацаю клешнями'
+                await imageworks.autocraber()
+        else:
+            if location == "space":
+                result = await imageworks.check_autopilot()
+                if result:
+                    await adb.pilot()
+                    await asyncio.sleep(0.1)
+                result = await imageworks.check_open_over()
+                if not result:
+                    await adb.openover()
+            capture_screenshot()
+            await asyncio.sleep(1)
+            result = await imageworks.check_enemies()
+            if result:
+                await ctx.send("Обнаружена угроза!")
+                with open('screenshot.png', 'rb') as f:
+                    picture = discord.File(f)
+                    await ctx.send(file=picture)
+                current_status = 'В системе враги, ожидаю 90 секунд'
+                print("В системе враги, докаюсь")
+                tap_random(click_coords)
+                await asyncio.sleep(90)
+            else:
+                current_status = 'Краблю'
+                await imageworks.autocraber()
+
+
+
+
+
+'''@bot.command() #Основной lowsec
+async def craber(ctx):
+    global current_status
+    global looping
+    looping = True
+    capture_screenshot()
+    cv2.imwrite(previous_file, imageworks.process_image('screenshot.png'))
+    result = await imageworks.check_in_dock()
+    if result:
+        print("Выхожу из дока")
+        await runner(ctx)
+    else:
+        while looping:
+            await asyncio.sleep(0.1)
+            # await ctx.send("Поехали")
+            try:
+                while looping:
+                    await asyncio.sleep(0.5)
+                    capture_screenshot()
+                    result = await imageworks.check_enemies()
+                    if result:
+                        tap_random(click_coords)
+                        await ctx.send("Обнаружена угроза!")
+                        with open('screenshot.png', 'rb') as f:
+                            picture = discord.File(f)
+                            await ctx.send(file=picture)
+                            await asyncio.sleep(120)
+                            result = await imageworks.check_in_dock()
+                            if result:
+                                await dock_detector()
+                            else:
+                                await lowsecrunner()
+                    else:
+                        result = await imageworks.check_open_over()
+                        if not result:
+                            print("Овервью закрыто, открываю")
+                            await openover(ctx)
+                        else:
+                            capture_screenshot()
+                            current_status = 'Пытаюсь крабить, все тихо'
+                            await asyncio.sleep(3)
+                            await imageworks.autocraber()  # процесс автолока, проверки щитов у цели
+            except Exception as e:
+                print("Произошла ошибка:")
+                traceback.print_exc()
+                with open("error_log.txt", "a") as f:
+                    f.write("Произошла ошибка:\n")
+                    f.write(traceback.format_exc())
+            await asyncio.sleep(1)
+        if not looping:
+            current_status = 'Ожидаю команду'
+
 
 async def lowsecrunner():
     global current_status
@@ -693,7 +741,7 @@ async def lowsecrunner():
             break
         current_status = 'Жду ухода врагов из системы'
         #print("инициализация перезапуска")
-        await asyncio.sleep(60)
+        await asyncio.sleep(20)
         capture_screenshot()
         result = await imageworks.check_enemies()
         if result:
@@ -704,7 +752,7 @@ async def lowsecrunner():
             if not looping:
                 break
             await asyncio.sleep(1)
-            break
+            break'''
 
 
 '''

@@ -48,6 +48,7 @@ async def processlock():
     white_pixels = np.sum(processed_image == 255)
     white_pixels_percentage = (white_pixels / total_pixels) * 100
     if white_pixels_percentage >= 30:
+        print("Обнаружен автолок")
         await lock()
 
 async def find(keywords: str):
@@ -129,7 +130,6 @@ async def check_open_over(): #Проверка открыто ли овервь�
     b_max = 165  # Максимальное значение B
     # print("Значения RGB пикселя:", r, g, b)
     if r > r_min and g < g_max and b < b_max:
-        print("овервью закрыто")
         return True
     else:
         return False
@@ -144,28 +144,78 @@ async def check_autopilot(): # Проверка на автопилот, есл�
     g_max = 165  # Максимальное значение G
     b_max = 175  # Максимальное значение B
     if not (r > r_min and g < g_max and b < b_max):
-        print("атопилот не установлен")
         return True
     else:
-        print("авопилот установлен")
+        return False
+async def check_local():
+    image_path = "screenshot.png"
+    img = cv2.imread(image_path)
+    x = 82  # Координата x
+    y = 157  # Координата y
+    b, g, r = img[y, x]  # Получаем значения синего, зеленого и красного цветов пикселя
+    r_min = 9  # Минимальное значение R
+    g_max = 15  # Максимальное значение G
+    b_max = 16  # Максимальное значение B
+    if not (r > r_min and g < g_max and b < b_max):
+        return True
+    else:
         return False
 
 async def check_in_dock():     # Проверка на док ##############################################
     image_path = "screenshot.png"
     img = cv2.imread(image_path)
-    x = 820  # Координата x
-    y = 172  # Координата y
+    x = 820  # Координата x #станка
+    y = 172  # Координата y #станка
     b, g, r = img[y, x]  # Получаем значения синего, зеленого и красного цветов пикселя
     r_min = 168  # Минимальное значение R
     g_max = 150  # Максимальное значение G
     b_max = 45  # Максимальное значение B
     # print("Значения RGB пикселя:", r, g, b)
     if r > r_min and g < g_max and b < b_max:
-        print("обнаружен док")
+        print("обнаружен док станции")
+        return True
+    else:
+        print("док станции не обнаружен")
+        return False
+
+async def check_in_pos():     # Проверка на док поса ##############################################
+    image_path = "screenshot.png"
+    img = cv2.imread(image_path)
+    x = 910  # Координата x #пос
+    y = 164  # Координата y #пос
+    b, g, r = img[y, x]  # Получаем значения синего, зеленого и красного цветов пикселя
+    r_min = 168  # Минимальное значение R
+    g_max = 150  # Максимальное значение G
+    b_max = 45  # Максимальное значение B
+    # print("Значения RGB пикселя:", r, g, b)
+    if r > r_min and g < g_max and b < b_max:
+        print("обнаружен док поса")
         return True
     else:
         print("док не обнаружен")
         return False
+
+async def check_in_space():     # Проверка на космос ##############################################
+    image_path = "screenshot.png"
+    img = cv2.imread(image_path)
+    x = 499  # Координата x #станка
+    y = 443  # Координата y #станка
+    b, g, r = img[y, x]  # Получаем значения синего, зеленого и красного цветов пикселя
+    r_min = 175  # Минимальное значение R
+    g_max = 170  # Максимальное значение G
+    b_max = 171  # Максимальное значение B
+    # print("Значения RGB пикселя:", r, g, b)
+    if r > r_min and g < g_max and b < b_max:
+        print("космос")
+        return True
+    else:
+        print("не космос")
+        return False
+
+async def locator():
+    global location
+
+
 
 async def check_enemies(): #Проверка наличия врагов в системе
     cv2.imwrite(current_file, process_image('screenshot.png'))
@@ -276,7 +326,6 @@ async def findsmall(): #найти маленькую
     else:
         return False
 
-
 async def check_enemy_shield():
     first_module = (650, 497)
     image_path = "screenshot.png"
@@ -293,6 +342,63 @@ async def check_enemy_shield():
         return True
     else:
         return False
+
+async def autocraber():
+    image_path = "screenshot.png"
+    img = cv2.imread(image_path)
+    x = 937  # Координата x
+    y = 63  # Координата y
+    b, g, r = img[y, x]  # Получаем значения синего, зеленого и красного цветов пикселя
+    r_min = 130  # Минимальное значение R
+    g_max = 25  # Максимальное значение G
+    b_max = 50  # Максимальное значение B
+    # print("Значения RGB пикселя:", r, g, b)
+    if r > r_min and g < g_max and b < b_max:
+        # print("Лочим непись")
+        await processlock()
+        await asyncio.sleep(0.5)
+        await processlock()
+        await asyncio.sleep(1)
+    else:
+        image_path = "screenshot.png"
+        img = cv2.imread(image_path)
+        x = 932  # Координата x
+        y = 62  # Координата y
+        b, g, r = img[y, x]  # Получаем значения синего, зеленого и красного цветов пикселя
+        r_min = 148  # Минимальное значение R
+        g_max = 155  # Максимальное значение G
+        b_max = 160  # Максимальное значение B
+        # print("Значения RGB пикселя:", r, g, b)
+        if r > r_min and g < g_max and b < b_max:
+            print("веду поиск целей")
+            selectedgrid = (937, 63)
+            tap_random(selectedgrid)
+            await asyncio.sleep(0.5)
+            tap_random(click_coords2)
+            await asyncio.sleep(0.5)
+            count = 0
+            while True:
+                result = await findsmall()
+                if result:
+                    break
+                else:
+                    count += 1
+                    print("веду поиск аномалий")
+                if count >= 3:
+                    break
+            await asyncio.sleep(1)
+            while True:
+                result = await findwarp()
+                if result:
+                    break
+                else:
+                    count += 1
+                    print("веду поиск кнопки варпа")
+                if count >= 3:
+                    break
+            await asyncio.sleep(1)
+            print("Ожидаю появление целей")
+            await check_red_npc()
 
 async def main_processor():
     image_path = "screenshot.png"
@@ -332,23 +438,24 @@ async def main_processor():
         await check_red_npc()
 
 async def check_red_npc():
-    while True:
+    count = 0  # Счетчик циклов
+    while count < 45:
         capture_screenshot()
         await asyncio.sleep(1)
         image_path = "screenshot.png"
         img = cv2.imread(image_path)
-        x = 926  # Координата x
-        y = 214  # Координата y
-        b, g, r = img[y, x]  # Получаем значения синего, зеленого и красного цветов пикселя
-        r_min = 200  # Минимальное значение R
-        g_max = 60  # Максимальное значение G
-        b_max = 85  # Максимальное значение B
-        # print("Значения RGB пикселя:", r, g, b)
+        x = 937  # Координата x
+        y = 63  # Координата y
+        b, g, r = img[y, x]
+        r_min = 130  # Минимальное значение R
+        g_max = 25  # Максимальное значение G
+        b_max = 50  # Максимальное значение B
         if r > r_min and g < g_max and b < b_max:
             break
         else:
             await asyncio.sleep(1)
-            continue
+            count += 1
+    print("Цели не найдены, цикл возобновлен")
 
 
 def add_watermark(image_path):
@@ -377,3 +484,62 @@ def add_grid_to_screenshot(screenshot_file, grid_size):
             globals()[f'coord_{i * grid_size[1] + j}'] = (center_x, center_y)
             cv2.rectangle(screenshot, (x1, y1), (x2, y2), (0, 255, 0), 1)
     cv2.imwrite('coords.png', screenshot)
+
+
+def determine_location(image_path):
+    img = cv2.imread(image_path)
+
+    if check_in_dock(img):
+
+        return "dock"
+    elif check_in_pos(img):
+
+        return "pos"
+    elif check_in_space(img):
+
+        return "space"
+    else:
+        print("Местонахождение не определено")
+        return "unknown"
+
+
+def check_in_dock(img):
+    x = 820
+    y = 172
+    b, g, r = img[y, x]
+    r_min = 168
+    g_max = 150
+    b_max = 45
+
+    if r > r_min and g < g_max and b < b_max:
+        return True
+    else:
+        return False
+
+
+def check_in_pos(img):
+    x = 910
+    y = 164
+    b, g, r = img[y, x]
+    r_min = 168
+    g_max = 150
+    b_max = 45
+
+    if r > r_min and g < g_max and b < b_max:
+        return True
+    else:
+        return False
+
+
+def check_in_space(img):
+    x = 499
+    y = 443
+    b, g, r = img[y, x]
+    r_min = 175
+    g_max = 170
+    b_max = 171
+
+    if r > r_min and g < g_max and b < b_max:
+        return True
+    else:
+        return False

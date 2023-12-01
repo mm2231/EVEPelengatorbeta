@@ -97,3 +97,48 @@ Traceback (most recent call last):
   File "C:\Users\Женя\PycharmProjects\BotplusTest\venv\Lib\site-packages\pytesseract\pytesseract.py", line 264, in run_tesseract
     raise TesseractError(proc.returncode, get_errors(error_string))
 pytesseract.pytesseract.TesseractError: (3221225786, 'ObjectCache(00007ffc248185a0)::~ObjectCache(): WARNING! LEAK! object 0000022c95273a60 still has count 1 (id C:\\Program Files\\Tesseract-OCR/tessdata/eng.traineddatalstm-punc-dawg) ObjectCache(00007ffc248185a0)::~ObjectCache(): WARNING! LEAK! object 0000022c931f8200 still has count 1 (id C:\\Program Files\\Tesseract-OCR/tessdata/eng.traineddatalstm-word-dawg) ObjectCache(00007ffc248185a0)::~ObjectCache(): WARNING! LEAK! object 0000022c95273ad0 still has count 1 (id C:\\Program Files\\Tesseract-OCR/tessdata/eng.traineddatalstm-number-dawg)')
+Произошла ошибка:
+Traceback (most recent call last):
+  File "C:\Users\Женя\PycharmProjects\EVEPelengatorbeta\main.py", line 660, in craber
+    await openover(ctx)
+  File "C:\Users\Женя\PycharmProjects\BotplusTest\venv\Lib\site-packages\discord\ext\commands\core.py", line 584, in __call__
+    return await self.callback(context, *args, **kwargs)  # type: ignore
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Женя\PycharmProjects\EVEPelengatorbeta\main.py", line 327, in openover
+    await adb.openover()
+  File "C:\Users\Женя\PycharmProjects\EVEPelengatorbeta\adb.py", line 239, in openover
+    tap_random(click_coords14)
+  File "C:\Users\Женя\PycharmProjects\EVEPelengatorbeta\adb.py", line 104, in tap_random
+    image_height, image_width, _ = image.shape  # Определение размеров изображения
+                                   ^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'shape'
+Произошла ошибка:
+Traceback (most recent call last):
+  File "C:\Users\Женя\PycharmProjects\EVEPelengatorbeta\main.py", line 644, in craber
+    result = await imageworks.check_enemies()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Женя\PycharmProjects\EVEPelengatorbeta\imageworks.py", line 171, in check_enemies
+    cv2.imwrite(current_file, process_image('screenshot.png'))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Женя\PycharmProjects\EVEPelengatorbeta\imageworks.py", line 32, in process_image
+    img_cropped = crop_image(file_path, crop_coords)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Женя\PycharmProjects\EVEPelengatorbeta\imageworks.py", line 28, in crop_image
+    img_cropped = img[crop_coords[1]:crop_coords[3], crop_coords[0]:crop_coords[2]]
+                  ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: 'NoneType' object is not subscriptable
+Произошла ошибка:
+Traceback (most recent call last):
+  File "C:\Users\Женя\PycharmProjects\EVEPelengatorbeta\main.py", line 641, in craber
+    await ctx.send("Обнаружена угроза!")
+         ^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Женя\PycharmProjects\EVEPelengatorbeta\imageworks.py", line 173, in check_enemies
+    cv2.imwrite(current_file, process_image('screenshot.png'))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Женя\PycharmProjects\EVEPelengatorbeta\imageworks.py", line 32, in process_image
+    img_cropped = crop_image(file_path, crop_coords)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Женя\PycharmProjects\EVEPelengatorbeta\imageworks.py", line 28, in crop_image
+    img_cropped = img[crop_coords[1]:crop_coords[3], crop_coords[0]:crop_coords[2]]
+                  ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: 'NoneType' object is not subscriptable

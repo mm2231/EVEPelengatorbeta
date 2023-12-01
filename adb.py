@@ -200,7 +200,6 @@ async def module(): #Активация 5 нижних модулей
     tap_random(drill5)
 
 async def undock():
-    print("Выхожу из дока.")
     tap_random(click_coords3)
 
 async def nanocore():
@@ -213,11 +212,10 @@ async def zoom():
     print("Зумим камеру")
 
 async def openlocal():
-    print("открываю локал")
     tap_random(click_coords9)
 
 async def core():
-    print("Включаю ядро")
+    print("Активация крайнего правого модуля с верху")
     tap_random(click_coords5)
 
 async def pilot():
