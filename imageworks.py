@@ -9,7 +9,7 @@ import pytesseract
 import cv2
 import numpy as np
 import random
-
+import re
 import adb
 from adb import capture_screenshot #convert_coordinates
 from adb import lock
@@ -359,6 +359,7 @@ async def autocraber():
         await asyncio.sleep(0.5)
         await processlock()
         await asyncio.sleep(1)
+        await stasis()
     else:
         image_path = "screenshot.png"
         img = cv2.imread(image_path)
@@ -399,6 +400,34 @@ async def autocraber():
             await asyncio.sleep(1)
             print("Ожидаю появление целей")
             await check_red_npc()
+
+async def stasis():
+    capture_screenshot()
+    result = await check_first_stasis()
+    if not result:
+        result = await check_enemy_grid()
+        if result:
+            select_grid = (937, 62)
+            tap_random(select_grid)
+            await asyncio.sleep(1)
+        result = await check_first_stasis()
+        if not result:
+            first_target_coords = (837, 69)
+            stasis1 = (648, 439)
+            tap_random(first_target_coords)
+            await asyncio.sleep(0.5)
+            focusfire = (650, 250)
+            tap_random(focusfire)
+            await asyncio.sleep(0.5)
+            tap_random(stasis1)
+            #await asyncio.sleep(random.uniform(0.3, 0.6))
+            #stasis2 = (705, 439)
+            #tap_random(stasis2)
+            #await asyncio.sleep(random.uniform(0.3, 0.6))
+            #stasis3 = (760, 434)
+            #tap_random(stasis3)
+            #print("Замедляю 1 цель")
+
 
 async def main_processor():
     image_path = "screenshot.png"
@@ -455,7 +484,7 @@ async def check_red_npc():
         else:
             await asyncio.sleep(1)
             count += 1
-    print("Цели не найдены, цикл возобновлен")
+    print("цикл возобновлен")
 
 
 def add_watermark(image_path):
@@ -501,6 +530,60 @@ def determine_location(image_path):
     else:
         print("Местонахождение не определено")
         return "unknown"
+
+'''
+async def distance():
+    crop_dx1, crop_dy1, crop_dx2, crop_dy2 = 761, 54, 792, 70 # Первая цель
+    capture_screenshot()
+    await asyncio.sleep(0.1)
+    img = cv2.imread('screenshot.png')
+    img_cropped1 = img[crop_dy1:crop_dy2, crop_dx1:crop_dx2]
+    cv2.imwrite('first_target.png', img_cropped1)
+    target = cv2.imread('first_target.png')
+    if target is not None:
+        text = pytesseract.image_to_string(target, config='--tessdata-dir "C:\\Program Files\\Tesseract-OCR\\tessdata"',
+                                           output_type='string')
+        if text:
+            print(text)
+            distance_str = ''.join(filter(str.isdigit, text))  # Извлекаем только цифры из строки
+            distance = int(distance_str)  # Преобразуем строку в число
+            if distance < 13:
+                return True
+'''
+
+async def check_first_stasis():
+    image_path = "screenshot.png"
+    img = cv2.imread(image_path)
+    x = 651  # Координата x
+    y = 417  # Координата y
+    b, g, r = img[y, x]  # Получаем значения синего, зеленого и красного цветов пикселя
+    r_min = 210  # Минимальное значение R
+    g_max = 257  # Максимальное значение G
+    b_max = 244  # Максимальное значение B
+    # print("Значения RGB пикселя:", r, g, b)
+    if r > r_min and g < g_max and b < b_max:
+        #print("сетки уже активны")
+        return True
+    else:
+        #print("сетка свободна для активации")
+        return False
+
+async def check_enemy_grid():
+    image_path = "screenshot.png"
+    img = cv2.imread(image_path)
+    x = 937  # Координата x
+    y = 63  # Координата y
+    b, g, r = img[y, x]  # Получаем значения синего, зеленого и красного цветов пикселя
+    r_min = 130  # Минимальное значение R
+    g_max = 25  # Максимальное значение G
+    b_max = 51  # Максимальное значение B
+    # print("Значения RGB пикселя:", r, g, b)
+    if r > r_min and g < g_max and b < b_max:
+        print("В гриде непись")
+        return True
+    else:
+        print("Неписи не обнаружил")
+        return False
 
 
 def check_in_dock(img):

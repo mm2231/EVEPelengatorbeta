@@ -674,6 +674,29 @@ async def craber(ctx):
                 current_status = 'Краблю'
                 await imageworks.autocraber()
 
+@bot.command()
+async def test(ctx):
+    capture_screenshot()
+    result = await imageworks.check_first_stasis()
+    if not result:
+        result = await imageworks.check_enemy_grid()
+        if result:
+            select_grid = (937, 62)
+            tap_random(select_grid)
+            await asyncio.sleep(1)
+        result = await imageworks.check_first_stasis()
+        if not result:
+            first_target_coords = (837, 69)
+            stasis1 = (648, 439)
+            tap_random(first_target_coords)
+            await asyncio.sleep(0.5)
+            focusfire = (650, 250)
+            tap_random(focusfire)
+            await asyncio.sleep(0.5)
+            tap_random(stasis1)
+            print("Замедляю 1 цель")
+
+
 
 
 
