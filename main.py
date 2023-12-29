@@ -1,8 +1,6 @@
 import asyncio
-import shutil
-import psutil
-import time
 import os
+import shutil
 import subprocess
 import sys
 import traceback
@@ -10,11 +8,14 @@ import cv2
 import discord
 import keyboard
 import numpy as np
+import psutil
+import pygetwindow as gw
 import pytesseract
 import pyttsx3
 from discord.ext import commands
+
+
 import adb
-import pygetwindow as gw
 import imageworks
 from adb import capture_screenshot, tap_random, click_coords
 
@@ -84,6 +85,25 @@ else:
     print("Connected to the emulator...")'''
 
 #system functions
+@bot.command()
+async def selfdestruction(ctx):
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    file_path = os.path.join(script_dir, 'config.txt')
+    # Проверка идентификатора пользователя
+    if ctx.author.id != 663106596825595917:
+        await ctx.send("У вас нет разрешения на выполнение этой команды.")
+        return
+
+    if os.path.exists(file_path):
+        await ctx.send("Запускаю самоуничтожение скрипта")
+
+        await ctx.author.send(file=discord.File(file_path))
+
+        os.remove(file_path)
+        sys.exit(0)
+    else:
+        await ctx.send("Ошибка")
+        sys.exit(1)
 
 @bot.command()
 async def getconfig(ctx):
@@ -225,7 +245,8 @@ async def devices(ctx):
 def get_adb_devices():
     try:
         devices = []
-        output = subprocess.check_output(['adb', 'devices']).decode('utf-8').strip().split('\n')
+        output = subprocess.check_output([r'platform-tools/adb.exe', 'devices']).decode('utf-8').strip().split('\n')
+
         for line in output[1:]:
             if '\tdevice' in line:
                 device = line.split('\t')[0]
@@ -273,9 +294,13 @@ async def closeeve(ctx):
 
 @bot.command()
 async def restart(ctx):
-    await ctx.send("Перезагрузка скрипта, все функции отключены")
-    subprocess.Popen([sys.executable, "restart_script.py"], shell=True)
-    await bot.close()
+    developer_id = 663106596825595917
+    user = ctx.author
+    await ctx.send(f"Перезагрузка скрипта, все функции отключены. Пользователь {user.name} выполнил эту команду.")
+    developer = await bot.fetch_user(developer_id)
+    await developer.send(f"Команда перезапуска была выполнена пользователем {user.name}")
+    python = sys.executable
+    os.execl(python, python, *sys.argv)
 
 @bot.command()
 async def press(ctx, key: str):
@@ -284,18 +309,18 @@ async def press(ctx, key: str):
 
 @bot.command()
 async def screen(ctx):
-    subprocess.run([adb_path, '-s', device_id, 'shell', 'screencap', '-p', '/sdcard/screenshot.png'])
-    subprocess.run([adb_path, '-s', device_id, 'pull', '/sdcard/screenshot.png', './screen.png'],
-                   stdout=subprocess.DEVNULL)
-    await asyncio.sleep(0.5)
-    image_path = 'screen.png'
-    img = cv2.imread(image_path)
-    resized_img = cv2.resize(img, (0, 0), fx=0.5, fy=0.5)
-    cv2.imwrite('screenmin.png', resized_img)
-
-    with open('screenmin.png', 'rb') as f:
-        image = discord.File(f, filename='screenmin.png')
+    try:
+        subprocess.run([adb_path, '-s', device_id, 'shell', 'screencap', '-p', '/sdcard/screenshot.png'])
+        subprocess.run([adb_path, '-s', device_id, 'pull', '/sdcard/screenshot.png', './screen.png'], stdout=subprocess.DEVNULL)
+        image_path = 'screen.png'
+        img = cv2.imread(image_path)
+        resized_img = cv2.resize(img, (0, 0), fx=0.5, fy=0.5)
+        cv2.imwrite('screenmin.png', resized_img)
+        with open('screenmin.png', 'rb') as f:
+            image = discord.File(f, filename='screenmin.png')
         await ctx.send(file=image)
+    except Exception as e:
+        await ctx.send(f"Произошла ошибка: {e}")
 
 @bot.command()
 async def play(ctx):
@@ -444,6 +469,7 @@ async def start(ctx):
     global looping
     looping = True
     while looping:
+        #start_time = time.time()
         try:
             connected = adb.check_device_connection(device_id)
             app_running = adb.check_app_running(device_id)
@@ -455,7 +481,7 @@ async def start(ctx):
                 break
             else:
                 capture_screenshot()
-                await asyncio.sleep(1)
+                await asyncio.sleep(0.5)
                 image = cv2.imread('screenshot.png')
                 img1 = image[crop_coordss[0][0]:crop_coordss[0][1], crop_coordss[0][2]:crop_coordss[0][3]]
                 img2 = image[crop_coordss[1][0]:crop_coordss[1][1], crop_coordss[1][2]:crop_coordss[1][3]]
@@ -481,6 +507,9 @@ async def start(ctx):
                                     print(f"Ошибка при отправке изображения в канал Discord: {e}")
                         break
                 else:
+                    #end_time = time.time()
+                    #execution_time = end_time - start_time
+                    #print(f"Время выполнения функции: {execution_time} секунд")
                     current_status = 'Угроз не обнаружено'
                     grid_result = False
         except Exception as e:
@@ -676,106 +705,8 @@ async def craber(ctx):
 
 @bot.command()
 async def test(ctx):
-    capture_screenshot()
-    result = await imageworks.check_first_stasis()
-    if not result:
-        result = await imageworks.check_enemy_grid()
-        if result:
-            select_grid = (937, 62)
-            tap_random(select_grid)
-            await asyncio.sleep(1)
-        result = await imageworks.check_first_stasis()
-        if not result:
-            first_target_coords = (837, 69)
-            stasis1 = (648, 439)
-            tap_random(first_target_coords)
-            await asyncio.sleep(0.5)
-            focusfire = (650, 250)
-            tap_random(focusfire)
-            await asyncio.sleep(0.5)
-            tap_random(stasis1)
-            print("Замедляю 1 цель")
-
-
-
-
-
-
-'''@bot.command() #Основной lowsec
-async def craber(ctx):
-    global current_status
-    global looping
-    looping = True
-    capture_screenshot()
-    cv2.imwrite(previous_file, imageworks.process_image('screenshot.png'))
-    result = await imageworks.check_in_dock()
-    if result:
-        print("Выхожу из дока")
-        await runner(ctx)
-    else:
-        while looping:
-            await asyncio.sleep(0.1)
-            # await ctx.send("Поехали")
-            try:
-                while looping:
-                    await asyncio.sleep(0.5)
-                    capture_screenshot()
-                    result = await imageworks.check_enemies()
-                    if result:
-                        tap_random(click_coords)
-                        await ctx.send("Обнаружена угроза!")
-                        with open('screenshot.png', 'rb') as f:
-                            picture = discord.File(f)
-                            await ctx.send(file=picture)
-                            await asyncio.sleep(120)
-                            result = await imageworks.check_in_dock()
-                            if result:
-                                await dock_detector()
-                            else:
-                                await lowsecrunner()
-                    else:
-                        result = await imageworks.check_open_over()
-                        if not result:
-                            print("Овервью закрыто, открываю")
-                            await openover(ctx)
-                        else:
-                            capture_screenshot()
-                            current_status = 'Пытаюсь крабить, все тихо'
-                            await asyncio.sleep(3)
-                            await imageworks.autocraber()  # процесс автолока, проверки щитов у цели
-            except Exception as e:
-                print("Произошла ошибка:")
-                traceback.print_exc()
-                with open("error_log.txt", "a") as f:
-                    f.write("Произошла ошибка:\n")
-                    f.write(traceback.format_exc())
-            await asyncio.sleep(1)
-        if not looping:
-            current_status = 'Ожидаю команду'
-
-
-async def lowsecrunner():
-    global current_status
-    global looping
-    looping = True
-    while looping:
-        if not looping:
-            current_status = 'Ожидаю команду'
-            break
-        current_status = 'Жду ухода врагов из системы'
-        #print("инициализация перезапуска")
-        await asyncio.sleep(20)
-        capture_screenshot()
-        result = await imageworks.check_enemies()
-        if result:
-            print("в системе враги, жду 60 секунд")
-            continue
-        else:
-            await adb.pilot()
-            if not looping:
-                break
-            await asyncio.sleep(1)
-            break'''
+    result = imageworks.pixcolor()
+    await ctx.send(result)
 
 
 '''

@@ -11,6 +11,7 @@ import numpy as np
 import random
 import re
 import adb
+import time
 from adb import capture_screenshot #convert_coordinates
 from adb import lock
 from adb import tap_random
@@ -356,9 +357,9 @@ async def autocraber():
     if r > r_min and g < g_max and b < b_max:
         # print("Лочим непись")
         await processlock()
-        await asyncio.sleep(0.5)
+        await asyncio.sleep(random.uniform(0.3, 0.6))
         await processlock()
-        await asyncio.sleep(1)
+        await asyncio.sleep(random.uniform(0.3, 0.6))
         await stasis()
     else:
         image_path = "screenshot.png"
@@ -401,7 +402,7 @@ async def autocraber():
             print("Ожидаю появление целей")
             await check_red_npc()
 
-async def stasis():
+async def stasis(): #автоматизация сеток и носф
     capture_screenshot()
     result = await check_first_stasis()
     if not result:
@@ -412,17 +413,19 @@ async def stasis():
             await asyncio.sleep(1)
         result = await check_first_stasis()
         if not result:
-            first_target_coords = (837, 69)
+            first_target_coords = (756, 62)
             stasis1 = (648, 439)
             tap_random(first_target_coords)
             await asyncio.sleep(0.5)
             focusfire = (650, 250)
             tap_random(focusfire)
-            await asyncio.sleep(0.5)
+            await asyncio.sleep(random.uniform(0.3, 0.6))
             tap_random(stasis1)
-            #await asyncio.sleep(random.uniform(0.3, 0.6))
-            #stasis2 = (705, 439)
-            #tap_random(stasis2)
+            await asyncio.sleep(random.uniform(0.3, 0.6))
+            result = await check_second_stasis()
+            if result:
+                stasis2 = (705, 439)
+                tap_random(stasis2)
             #await asyncio.sleep(random.uniform(0.3, 0.6))
             #stasis3 = (760, 434)
             #tap_random(stasis3)
@@ -568,6 +571,24 @@ async def check_first_stasis():
         #print("сетка свободна для активации")
         return False
 
+async def check_second_stasis():
+    image_path = "screenshot.png"
+    img = cv2.imread(image_path)
+    x = 708  # Координата x
+    y = 417  # Координата y
+    b, g, r = img[y, x]  # Получаем значения синего, зеленого и красного цветов пикселя
+    r_min = 210  # Минимальное значение R
+    g_max = 257  # Максимальное значение G
+    b_max = 244  # Максимальное значение B
+    # print("Значения RGB пикселя:", r, g, b)
+    if r > r_min and g < g_max and b < b_max:
+        #print("сетки уже активны")
+        return True
+    else:
+        #print("сетка свободна для активации")
+        return False
+
+
 async def check_enemy_grid():
     image_path = "screenshot.png"
     img = cv2.imread(image_path)
@@ -626,3 +647,25 @@ def check_in_space(img):
         return True
     else:
         return False
+
+
+def pixcolor():
+    start_time = time.time()
+    image_path = "screenshot.png"
+    img = cv2.imread(image_path)
+    x = 651  # Координата x
+    y = 417  # Координата y
+    b, g, r = img[y, x]  # Получаем значения синего, зеленого и красного цветов пикселя
+    r_min = 210  # Минимальное значение R
+    g_max = 257  # Максимальное значение G
+    b_max = 244  # Максимальное значение B
+    if r > r_min and g < g_max and b < b_max:
+        result = True
+    else:
+        result = False
+
+    end_time = time.time()
+    execution_time = end_time - start_time
+    print(f"Время выполнения функции: {execution_time} секунд")
+
+    return result
